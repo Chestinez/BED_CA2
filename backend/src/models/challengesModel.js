@@ -31,7 +31,20 @@ module.exports = {
 
     pool.query(sql, (err, results) => {
       if (err) return callback(err);
-      return callback(null, results);
+      getdifficultysql = "SELECT name, id FROM difficulty";
+      pool.query(getdifficultysql, (err, difficultynames) => {
+        if (err) return callback(err);
+        const challengeWithDifficulty = results.map((challenge) => {
+          const difficultyName = difficultynames.find(
+            (d) => d.id === challenge.difficultyId,
+          );
+          return {
+            ...challenge,
+            difficultyName: difficultyName ? difficultyName.name : null,
+          };
+        });
+        return callback(null, challengeWithDifficulty);
+      });
     });
   },
 
@@ -216,11 +229,11 @@ module.exports = {
                         newCredits: userResults[0].credits,
                       });
                     });
-                  }
+                  },
                 );
-              }
+              },
             );
-          }
+          },
         );
       });
     });
