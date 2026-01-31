@@ -1,0 +1,51 @@
+/* Import sci-fi font (optional but nice) */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap');
+
+body {
+  background: radial-gradient(circle at top, #192fac, #637bb7);
+  color: rgb(224, 247, 255);
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* Glass hologram card */
+.futuristic-card {
+  background: rgba(10, 20, 40, 0.85);
+  border: 1px solid #00f7ff;
+  box-shadow: 0 0 20px #00f7ff44;
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+}
+
+/* Glowing input fields */
+.futuristic-input {
+  background: transparent;
+  border: 1px solid #00f7ff88;
+  color: rgb(224, 247, 255);
+}
+
+.futuristic-input:focus {
+  background: transparent;
+  border-color: #00f7ff;
+  box-shadow: 0 0 8px #00f7ff;
+  color: rgb(255, 255, 255);
+}
+
+/* Neon button */
+.futuristic-btn {
+  background: #00f7ff;
+  border: none;
+  color: #020409;
+  font-weight: bold;
+  letter-spacing: 1px;
+  box-shadow: 0 0 12px #00f7ff;
+}
+
+.futuristic-btn:hover {
+  background: #00d5dd;
+  box-shadow: 0 0 18px #00f7ff;
+}
+
+/* Title glow */
+.futuristic-title {
+  text-shadow: 0 0 8px #00f7ff;
+}
