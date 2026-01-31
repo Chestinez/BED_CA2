@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import api from "../services/api";
+import api from "../../services/api";
 import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
 import ChallengeCard from "../../components/challenge/ChallengeCard";
 export default function Challenges() {
@@ -10,7 +10,7 @@ export default function Challenges() {
     const AllChallengesFetch = async () => {
       try {
         const res = await api.get("/challenges/selectAll");
-        setChallenges(res.data);
+        setChallenges(res.data.results);
       } catch (err) {
         setChallenges([]);
         console.error("Error fetching challenges:", err);
@@ -24,7 +24,7 @@ export default function Challenges() {
     <PageLoadWrap>
       <div>
         <h1>Challenges</h1>
-        <div className="challenges-container">
+        <div className="challenges-container overflow-auto">
           {challenges.length === 0 ? (
             <p className="text-center text-muted">No challenges available.</p>
           ) : (

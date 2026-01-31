@@ -1,11 +1,10 @@
 import React from "react";
-
 export default function ChallengeCard({ challenge }) {
   return (
     <div
-      className={`challenge-card ${!challenge.is_Active ? "opacity-50" : ""} mb-4 p-3 border rounded`}
+      className={`challenge-card ${!challenge.is_Active || challenge.is_Active === "0" ? "opacity-50" : ""} mb-4 p-3 border rounded`}
     >
-      {challenge.is_Active ? (
+      {challenge.is_Active === "1" ? (
         <>
           <h3>{challenge.title}</h3>
           <p>{challenge.description}</p>

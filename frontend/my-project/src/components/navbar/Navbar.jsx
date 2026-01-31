@@ -14,6 +14,9 @@ function Navbar() {
           Shop
         </a>
         {/* <a className="nav-link text-white" href="#">Challenges</a> */}
+        <a className="nav-link text-white" href="/challenges">
+          Challenges
+        </a>
       </nav>
     </div>
   );

@@ -1,3 +1,9 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 :root {
   --bg-dark: rgb(18, 20, 24);
   --card-bg: rgba(255, 255, 255, 0.05); /* The "Glass" effect */
@@ -8,7 +14,8 @@
 body {
   background-color: var(--bg-dark);
   color: white;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
+  overflow-y: auto;
 }
 
 /* App container */
@@ -90,14 +97,14 @@ body {
   background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
   position: relative;
   animation: pulse 2s ease-in-out infinite;
-  box-shadow: 
+  box-shadow:
     0 0 20px var(--neon-blue),
     0 0 40px var(--neon-purple),
     0 0 60px var(--neon-blue);
 }
 
 .loader-orb::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -109,7 +116,8 @@ body {
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
