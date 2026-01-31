@@ -1,7 +1,8 @@
-import React from 'react'
-import {useState, useEffect} from 'react';
+import React from "react";
+import { useState, useEffect } from "react";
 import api from "../services/api";
-import PageLoadWrap from '../../components/PageLoader/pageLoadWrap';
+import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
+import ChallengeCard from "../../components/challenge/ChallengeCard";
 export default function Challenges() {
   const [challenges, setChallenges] = useState([]);
   useEffect(() => {
@@ -14,9 +15,11 @@ export default function Challenges() {
         setChallenges([]);
         console.error("Error fetching challenges:", err);
       }
-    }
-  }, [])
-  
+    };
+
+    AllChallengesFetch();
+  }, []);
+
   return (
     <PageLoadWrap>
       <div>
@@ -26,13 +29,13 @@ export default function Challenges() {
             <p className="text-center text-muted">No challenges available.</p>
           ) : (
             challenges.map((challenge) => {
-              return <div className="challenge-card mb-4" key={challenge.id}>
-                
-              </div>;
+              return (
+                <ChallengeCard key={challenge.id} challenge={challenge} />
+              );
             })
-          )
+          )}
         </div>
       </div>
     </PageLoadWrap>
-  )
+  );
 }
