@@ -2,15 +2,22 @@ import React from "react";
 export default function ChallengeCard({ challenge }) {
   return (
     <div
-      className={`challenge-card ${!challenge.is_Active || challenge.is_Active === "0" ? "opacity-50" : ""} mb-4 p-3 border rounded`}
+      className={`challenge-card ${String(challenge.is_active) === "0" ? "opacity-50" : ""} mb-4 p-3 border rounded`}
     >
-      {challenge.is_Active === "1" ? (
+      {String(challenge.is_active) === "1" ? (
         <>
           <h3>{challenge.title}</h3>
           <p>{challenge.description}</p>
           <p>Points: {challenge.points_rewarded}</p>
           <p>Credits: {challenge.credits_rewarded}</p>
-          <p></p>
+          <p>Duration: {challenge.duration_days} days</p>
+          <div>
+            <span className="badge bg-info text-dark me-2">
+              Difficulty: {challenge.difficultyName}
+            </span>
+          </div>
+          <p>By: {challenge.creatorName}</p>
+          <button className="btn btn-primary">Start Challenge</button>
         </>
       ) : (
         <>

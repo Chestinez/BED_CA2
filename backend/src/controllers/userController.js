@@ -54,9 +54,6 @@ module.exports = {
             maxAge: 7 * 24 * 60 * 60 * 1000,
           });
 
-
-
-          
           return res.status(200).json({
             message: "login successful, here is your user-Id", // if match return user id
             user,
@@ -71,7 +68,10 @@ module.exports = {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken)
       return next(
-        new AppError("Refresh Token not found, please re-login or re-register", 403)
+        new AppError(
+          "Refresh Token not found, please re-login or re-register",
+          403,
+        ),
       );
     jwt.verify(refreshToken, process.env.REFRESH_SECRET, (err, decoded) => {
       if (err)
@@ -245,11 +245,11 @@ module.exports = {
 
   getLeaderboard(req, res, next) {
     // get leaderboard
-    if (!req.body) {
-      req.body = {}; // if no body, set body to empty
+    if (!req.query) {
+      req.query = {}; // if no body, set body to empty
     }
 
-    let filterCount = req.body.filterCount; //filterCount to filter how many users the leaderboard will show starting from highest points
+    let filterCount = req.query.filterCount; //filterCount to filter how many users the leaderboard will show starting from highest points
 
     if (!filterCount || isNaN(filterCount) || filterCount <= 0) {
       filterCount = 10;
@@ -261,7 +261,7 @@ module.exports = {
       }
 
       res.status(200).json({
-        rankings: results, // return results
+        status: "success", results: results, // return results
       });
     });
   },

@@ -16,6 +16,7 @@ module.exports = {
       return res.status(200).json({ message: "success", results: results }); // return results
     });
   },
+
   selectAll(_, res, next) {
     // selectAll
     challengeModels.selectAll((err, results) => {

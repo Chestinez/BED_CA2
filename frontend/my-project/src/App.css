@@ -13,7 +13,7 @@
 
 body {
   background-color: var(--bg-dark);
-  color: white;
+  color: rgb(230, 244, 249);
   font-family: "Inter", sans-serif;
   overflow-y: auto;
 }

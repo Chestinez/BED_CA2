@@ -27,24 +27,19 @@ module.exports = {
   // this model is used to get all challenges and their respective data
   // this model is used by the /selectAll endpoint
   selectAll(callback) {
-    let sql = `SELECT * FROM challenges`;
-
+    const sql = `
+    SELECT 
+      challenges.*, 
+      difficulty.name AS difficultyName, 
+      user.username AS creatorName
+    FROM challenges
+    LEFT JOIN difficulty ON challenges.difficulty_id = difficulty.id
+    LEFT JOIN user ON challenges.creator_id = user.id
+  `;
     pool.query(sql, (err, results) => {
       if (err) return callback(err);
-      getdifficultysql = "SELECT name, id FROM difficulty";
-      pool.query(getdifficultysql, (err, difficultynames) => {
-        if (err) return callback(err);
-        const challengeWithDifficulty = results.map((challenge) => {
-          const difficultyName = difficultynames.find(
-            (d) => d.id === challenge.difficultyId,
-          );
-          return {
-            ...challenge,
-            difficultyName: difficultyName ? difficultyName.name : null,
-          };
-        });
-        return callback(null, challengeWithDifficulty);
-      });
+
+      return callback(null, results);
     });
   },
 

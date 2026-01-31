@@ -24,7 +24,7 @@ export default function Challenges() {
     <PageLoadWrap>
       <div>
         <h1>Challenges</h1>
-        <div className="challenges-container overflow-auto">
+        <div className="challenges-container overflow-auto" style={{ maxHeight: "100vh" }}>
           {challenges.length === 0 ? (
             <p className="text-center text-muted">No challenges available.</p>
           ) : (

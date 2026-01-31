@@ -7,7 +7,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Register from "./pages/Register/register";
 import Shop from "./pages/shop/Shop";
 import Challenges from "./pages/challenges/Challenges";
-
+import LeaderBoard from "./pages/leaderboard/LeaderBoard";
 export default function App() {
   return (
     <Router>
@@ -19,6 +19,7 @@ export default function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/challenges" element={<Challenges />} />
+          <Route path="/leaderboard" element={<LeaderBoard />} />
         </Route>
 
         <Route path="*" element={<h1>404 - Page not found</h1>} />

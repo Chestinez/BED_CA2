@@ -17,6 +17,9 @@ function Navbar() {
         <a className="nav-link text-white" href="/challenges">
           Challenges
         </a>
+        <a className="nav-link text-white" href="/leaderboard">
+          Leaderboard
+        </a>
       </nav>
     </div>
   );
