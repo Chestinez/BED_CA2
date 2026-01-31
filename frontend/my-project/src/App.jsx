@@ -6,6 +6,7 @@ import ProtectedRoutes from "./utils/ProtectedRoutes";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Register from "./pages/Register/register";
 import Shop from "./pages/shop/Shop";
+import Challenges from "./pages/challenges/Challenges";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/" element={<Dashboard />} />
           <Route path="/shop" element={<Shop />} />
+          <Route path="/challenges" element={<Challenges />} />
         </Route>
 
         <Route path="*" element={<h1>404 - Page not found</h1>} />

@@ -15,7 +15,7 @@ function PageLoadWrap({ children }) {
       if (!loading) {
         setShowLoader(false);
       }
-    }, 800);
+    }, 700);
 
     return () => clearTimeout(minLoadTime);
   }, [loading]);
