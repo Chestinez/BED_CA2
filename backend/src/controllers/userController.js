@@ -140,7 +140,7 @@ module.exports = {
 
   getSelfProfileLog(req, res, next) {
     // getSelfProfileLog
-    const userId = req.user.id; // obtaining user id from auth middleware
+    const userId = req.userId; // obtaining user id from auth middleware
 
     userModel.getProfilerankinclusiveByUserId(userId, (err, results) => {
       // select public valid user data by user id

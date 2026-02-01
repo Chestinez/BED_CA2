@@ -87,40 +87,11 @@ module.exports = {
     `;
       pool.query(sql, [userId, userId, userId, userId], (err, results) => {
         if (err) return callback(err);
-        const profileresults = results[0];
-        const nextranksql = `SELECT min_points AS next_rank_minpoints FROM \`rank\` WHERE min_points > ? ORDER BY min_points ASC LIMIT 1`;
-        pool.query(
-          nextranksql,
-          [profileresults.min_points],
-          (err, nextRankResults) => {
-            if (err) return callback(err);
-            if (nextRankResults.length > 0) {
-              profileresults.next_rank_minpoints =
-                nextRankResults[0].next_rank_minpoints;
-            }
-            const nextRankPoints =
-              profileresults.points !== null &&
-              profileresults.next_rank_minpoints !== undefined
-                ? profileresults.next_rank_minpoints - profileresults.points
-                : null;
-            const nextRankPercentage =
-              nextRankPoints !== null
-                ? (nextRankPoints /
-                    (profileresults.next_rank_minpoints -
-                      profileresults.points)) *
-                  100
-                : null;
-            const profileData = {
-              ...profileresults,
-              next_rank_points: nextRankPoints,
-              next_rank_percentage: nextRankPercentage,
-            };
-            return callback(null, profileData);
-          },
-        );
+        return callback(null, results);
       });
     });
   },
+
   //getProfilerankinclusiveByUserId
   // this model is used to get a user by id, where user data is public and non vulnerable like password
   // this model is used by the /profile/me endpoint
@@ -131,22 +102,50 @@ module.exports = {
     u.points,
     u.credits,
     u.created_at AS account_age,
-  (SELECT COUNT(*) FROM user_completions uc WHERE uc.user_id = ? AND uc.status = 'completed') AS missions_completed,
-  (SELECT COUNT(*) FROM user_completions uc WHERE uc.user_id = ? AND uc.status = 'pending') AS missions_pending,
-  (SELECT COUNT(*) FROM user_completions uc WHERE uc.user_id = ? ) AS missions_total,
+  (SELECT COUNT(*) FROM user_completions ui WHERE ui.user_id = ? AND ui.status = 'completed') AS missions_completed,
+  (SELECT COUNT(*) FROM user_completions ui WHERE ui.user_id = ? AND ui.status = 'pending') AS missions_pending,
+  (SELECT COUNT(*) FROM user_completions ui WHERE ui.user_id = ? ) AS missions_total,
     r.name AS \`rank\`,
     r.min_points
     FROM user u
     JOIN \`rank\` r ON u.points >= r.min_points
     WHERE u.id = ?
     ORDER BY r.min_points DESC
-    LIMIT 1
+    LIMIT 1;
     `;
     pool.query(sql, [userId, userId, userId, userId], (err, results) => {
-      if (err) {
-        return callback(err);
-      }
-      return callback(null, results);
+      if (err) return callback(err);
+      const profileresults = results[0];
+      const nextranksql = `SELECT min_points AS next_rank_minpoints FROM \`rank\` WHERE min_points > ? ORDER BY min_points ASC LIMIT 1`;
+      pool.query(
+        nextranksql,
+        [profileresults.min_points],
+        (err, nextRankResults) => {
+          if (err) return callback(err);
+          if (nextRankResults.length > 0) {
+            profileresults.next_rank_minpoints =
+              nextRankResults[0].next_rank_minpoints;
+          }
+          const nextRankPoints =
+            profileresults.points !== null &&
+            profileresults.next_rank_minpoints !== undefined
+              ? profileresults.next_rank_minpoints - profileresults.points
+              : null;
+          const nextRankPercentage =
+            nextRankPoints !== null
+              ? (nextRankPoints /
+                  (profileresults.next_rank_minpoints -
+                    profileresults.points)) *
+                100
+              : null;
+          const profileData = {
+            ...profileresults,
+            next_rank_points: nextRankPoints,
+            next_rank_percentage: nextRankPercentage,
+          };
+          return callback(null, profileData);
+        },
+      );
     });
   },
   //createUser
