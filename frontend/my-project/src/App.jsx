@@ -8,6 +8,9 @@ import Register from "./pages/Register/register";
 import Shop from "./pages/shop/Shop";
 import Challenges from "./pages/challenges/Challenges";
 import LeaderBoard from "./pages/leaderboard/LeaderBoard";
+import Profile from "./pages/Inventory/Profile";
+import Ship from "./pages/Ship/Ship";
+
 export default function App() {
   return (
     <Router>
@@ -20,6 +23,8 @@ export default function App() {
           <Route path="/shop" element={<Shop />} />
           <Route path="/challenges" element={<Challenges />} />
           <Route path="/leaderboard" element={<LeaderBoard />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/ship" element={<Ship />} />
         </Route>
 
         <Route path="*" element={<h1>404 - Page not found</h1>} />

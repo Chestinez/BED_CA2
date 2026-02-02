@@ -1,27 +1,30 @@
 import React from "react";
-import { useState, useEffect } from "react";
-import api from "../../services/api";
 import { useAuth } from "../../hooks/useAuth";
-
-const baseShipsUrl = {
-  1: "/baseShips/Ship1.png",
-  2: "/baseShips/Ship2.png",
-  3: "/baseShips/Ship3.png",
-  4: "/baseShips/Ship4.png",
-  5: "/baseShips/Ship5.png",
-  6: "/baseShips/Ship6.png",
-  7: "/baseShips/Nairan - Dreadnought - Base.png",
-  8: "/baseShips/Nairan - Battlecruiser - Base.png",
-};
+import ShipAssembly from "../../components/InventoryScene/ShipAssembly";
+import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
 export default function Profile() {
   const { user } = useAuth();
   const profileData = user
     ? JSON.parse(localStorage.getItem("userData"))[0]
     : null;
-  const shipSrc = baseShipsUrl[profileData ? profileData.i : 1];
   return (
     <>
-      <div>Profile Page</div>
+      <PageLoadWrap>
+        <div>Profile Page</div>
+        {profileData && (
+          <div>
+            <h2>Username: {profileData.username}</h2>
+            <h3>Rank: {profileData.rank} </h3>
+            <h4>Points: {profileData.points}</h4>
+            <h4>Credits: {profileData.credits}</h4>
+            <h4>created_at: {profileData.account_age}</h4>
+            <h4>Missions Completed: {profileData.missions_completed}</h4>
+            <h4>Missions Pending: {profileData.missions_pending}</h4>
+            <h4>Missions Total: {profileData.missions_total}</h4>
+            <ShipAssembly profileData={profileData} />
+          </div>
+        )}
+      </PageLoadWrap>
     </>
   );
 }

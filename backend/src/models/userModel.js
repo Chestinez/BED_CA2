@@ -77,6 +77,7 @@ module.exports = {
   (SELECT COUNT(*) FROM user_completions ui WHERE ui.user_id = ? AND ui.status = 'completed') AS missions_completed,
   (SELECT COUNT(*) FROM user_completions ui WHERE ui.user_id = ? AND ui.status = 'pending') AS missions_pending,
   (SELECT COUNT(*) FROM user_completions ui WHERE ui.user_id = ? ) AS missions_total,
+    r.id AS rank_id,
     r.name AS \`rank\`,
     r.min_points
     FROM user u
@@ -105,6 +106,7 @@ module.exports = {
   (SELECT COUNT(*) FROM user_completions ui WHERE ui.user_id = ? AND ui.status = 'completed') AS missions_completed,
   (SELECT COUNT(*) FROM user_completions ui WHERE ui.user_id = ? AND ui.status = 'pending') AS missions_pending,
   (SELECT COUNT(*) FROM user_completions ui WHERE ui.user_id = ? ) AS missions_total,
+    r.id AS rank_id,
     r.name AS \`rank\`,
     r.min_points
     FROM user u
@@ -143,7 +145,7 @@ module.exports = {
             next_rank_points: nextRankPoints,
             next_rank_percentage: nextRankPercentage,
           };
-          return callback(null, profileData);
+          return callback(null, [profileData]);
         },
       );
     });

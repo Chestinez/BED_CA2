@@ -134,7 +134,7 @@ module.exports = {
       } else if (!results || results.length === 0) {
         return next(new AppError("user not found", 404)); // if no results, user not found
       }
-      return res.status(200).json({ message: "success", results }); // return results
+      return res.status(200).json({ message: "success", results: results }); // return results
     });
   },
 
@@ -147,7 +147,7 @@ module.exports = {
       if (err) {
         return next(new AppError("Internal Server Error", 500));
       }
-      return res.status(200).json({ message: "success", results }); // return results
+      return res.status(200).json({ message: "success", results: results }); // return results
     });
   },
   createUser(req, res, next) {

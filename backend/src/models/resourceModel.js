@@ -356,4 +356,49 @@ module.exports = {
       return callback(null, results);
     });
   },
+
+  // getUserShipByRank
+  // this model is used to get user's ship based on their rank
+  // this model is used by the /ship endpoint
+  getUserShipByRank(userId, callback) {
+    const sql = `
+      SELECT 
+        u.id as user_id,
+        u.username,
+        u.points,
+        r.id as rank_id,
+        r.name as rank_name,
+        r.max_slots,
+        CASE 
+          WHEN r.id = 1 THEN 'Ship1.png'
+          WHEN r.id = 2 THEN 'Ship2.png'
+          WHEN r.id = 3 THEN 'Ship3.png'
+          WHEN r.id = 4 THEN 'Ship4.png'
+          WHEN r.id = 5 THEN 'Nairan - Battlecruiser - Base.png'
+          WHEN r.id = 6 THEN 'Nairan - Dreadnought - Base.png'
+          ELSE 'Ship1.png'
+        END as base_ship_image,
+        (SELECT IFNULL(SUM(p.slot_size), 0) 
+         FROM ship_parts p 
+         JOIN user_inventory ui ON p.id = ui.part_id 
+         WHERE ui.user_id = ? AND ui.is_equipped = 'equipped') AS used_slots
+      FROM user u
+      JOIN \`rank\` r ON u.points >= r.min_points
+      WHERE u.id = ?
+      ORDER BY r.min_points DESC
+      LIMIT 1
+    `;
+    
+    pool.query(sql, [userId, userId], (err, results) => {
+      if (err) return callback(err);
+      if (!results || results.length === 0) {
+        return callback(new Error("User not found"));
+      }
+      
+      const shipData = results[0];
+      shipData.available_slots = shipData.max_slots - shipData.used_slots;
+      
+      callback(null, shipData);
+    });
+  },
 };

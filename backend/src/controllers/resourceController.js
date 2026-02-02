@@ -101,4 +101,21 @@ module.exports = {
       });
     });
   },
+
+  // getUserShip
+  // get user's ship based on rank with equipped parts info
+  getUserShip(req, res, next) {
+    const userId = req.userId;
+
+    resourceModel.getUserShipByRank(userId, (err, results) => {
+      if (err) {
+        return next(new AppError("Failed to get user ship", 500));
+      }
+      
+      res.status(200).json({
+        message: "User ship retrieved successfully",
+        results: results
+      });
+    });
+  },
 };

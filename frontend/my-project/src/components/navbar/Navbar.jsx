@@ -13,12 +13,19 @@ function Navbar() {
         <a className="nav-link text-white" href="/shop">
           Shop
         </a>
+        <a className="nav-link text-white" href="/ship">
+          <i className="fas fa-rocket me-2"></i>
+          Ship
+        </a>
         {/* <a className="nav-link text-white" href="#">Challenges</a> */}
         <a className="nav-link text-white" href="/challenges">
           Challenges
         </a>
         <a className="nav-link text-white" href="/leaderboard">
           Leaderboard
+        </a>
+        <a className="nav-link text-white" href="/profile">
+          Profile
         </a>
       </nav>
     </div>

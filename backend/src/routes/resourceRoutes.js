@@ -24,4 +24,8 @@ router.post("/purchase/:partId", auth, controllers.purchasePart);
 router.post("/purchase/", (req, res, next) => {
   return next(new AppError("Missing required partId in URL", 400)); // this endpoint is used for when no required params is left empty 
 })
+
+// get user's ship based on rank
+router.get("/ship", auth, controllers.getUserShip);
+
 module.exports = router;
