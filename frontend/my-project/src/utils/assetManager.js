@@ -51,10 +51,7 @@ export const SPACE_EFFECTS = {
 
 // General Space Backgrounds
 export const SPACE_BACKGROUNDS = {
-  default: '/assets/backgrounds/space/default-space.jpg',
-  nebula: '/assets/backgrounds/space/nebula-field.jpg',
-  asteroid: '/assets/backgrounds/space/asteroid-field.jpg',
-  galaxy: '/assets/backgrounds/space/galaxy-view.jpg'
+  1: "",
 };
 
 // Helper function to get part asset

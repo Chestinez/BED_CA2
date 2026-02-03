@@ -133,13 +133,28 @@ module.exports = {
             profileresults.next_rank_minpoints !== undefined
               ? profileresults.next_rank_minpoints - profileresults.points
               : null;
-          const nextRankPercentage =
-            nextRankPoints !== null
-              ? (nextRankPoints /
-                  (profileresults.next_rank_minpoints -
-                    profileresults.points)) *
-                100
-              : null;
+          
+          // Calculate percentage correctly
+          const nextRankPercentage = (() => {
+            if (nextRankPoints === null || profileresults.next_rank_minpoints === undefined) {
+              return null; // No next rank (max rank reached)
+            }
+            
+            // Total points needed from current rank to next rank
+            const totalPointsForNextRank = profileresults.next_rank_minpoints - profileresults.min_points;
+            
+            // Points already earned towards next rank
+            const pointsEarnedTowardsNext = profileresults.points - profileresults.min_points;
+            
+            // Calculate percentage (0-100%)
+            if (totalPointsForNextRank <= 0) {
+              return 100; // Edge case: same rank requirements
+            }
+            
+            const percentage = Math.min(100, Math.max(0, (pointsEarnedTowardsNext / totalPointsForNextRank) * 100));
+            console.log('Calculated percentage:', percentage);
+            return percentage;
+          })();
           const profileData = {
             ...profileresults,
             next_rank_points: nextRankPoints,
@@ -196,8 +211,15 @@ module.exports = {
       u.id,
       u.username,
       u.points,
-      u.credits
+      u.credits,
+      r.name AS \`rank\`
     FROM user u
+    LEFT JOIN \`rank\` r ON u.points >= r.min_points
+    WHERE r.min_points = (
+      SELECT MAX(r2.min_points) 
+      FROM \`rank\` r2 
+      WHERE u.points >= r2.min_points
+    )
     ORDER BY u.points DESC, u.credits DESC
     LIMIT ?`;
 

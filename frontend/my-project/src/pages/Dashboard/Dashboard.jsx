@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef} from "react";
 import { useAuth } from "../../hooks/useAuth";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -24,13 +24,8 @@ export default function Dashboard() {
       return { percentage: 100, pointsNeeded: 0, isMaxRank: true };
     }
     
-    // Calculate actual percentage (invert the calculation since next_rank_percentage is points needed)
-    const totalPointsForNextRank = userProfile.next_rank_minpoints - userProfile.min_points;
-    const currentProgress = totalPointsForNextRank - nextRankPoints;
-    const actualPercentage = totalPointsForNextRank > 0 ? (currentProgress / totalPointsForNextRank) * 100 : 0;
-    
     return {
-      percentage: Math.max(0, Math.min(100, actualPercentage)),
+      percentage: nextRankPercentage,
       pointsNeeded: nextRankPoints,
       isMaxRank: false
     };

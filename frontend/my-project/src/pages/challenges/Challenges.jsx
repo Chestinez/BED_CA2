@@ -35,6 +35,7 @@ export default function Challenges() {
             })
           )}
         </div>
+        <button className="btn btn-primary"><a href="/createChallenge">Create Challenge</a></button>
       </div>
     </PageLoadWrap>
   );
