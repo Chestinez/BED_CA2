@@ -9,7 +9,7 @@ import Shop from "./pages/shop/Shop";
 import Challenges from "./pages/challenges/Challenges";
 import LeaderBoard from "./pages/leaderboard/LeaderBoard";
 import Profile from "./pages/Inventory/Profile";
-import Ship from "./pages/Ship/Ship";
+import CreateChallenges from "./pages/challenges/CreateChallenges";
 
 export default function App() {
   return (
@@ -22,9 +22,9 @@ export default function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/challenges" element={<Challenges />} />
+          <Route path="/createChallenge" element={<CreateChallenges />} />
           <Route path="/leaderboard" element={<LeaderBoard />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/ship" element={<Ship />} />
         </Route>
 
         <Route path="*" element={<h1>404 - Page not found</h1>} />

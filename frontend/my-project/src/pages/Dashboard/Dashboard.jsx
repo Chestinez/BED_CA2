@@ -4,6 +4,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import Navbar from "../../components/navbar/Navbar";
 import ShipAssembly from "../../components/InventoryScene/ShipAssembly";
+import RankBackground from "../../components/backgrounds/RankBackground";
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
