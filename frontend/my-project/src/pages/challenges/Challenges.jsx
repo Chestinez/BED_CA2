@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import api from "../../services/api";
 import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
 import ChallengeCard from "../../components/challenge/ChallengeCard";
+import { Outlet, Link, useParams } from "react-router-dom";
 export default function Challenges() {
   const [challenges, setChallenges] = useState([]);
   useEffect(() => {
@@ -22,21 +23,29 @@ export default function Challenges() {
 
   return (
     <PageLoadWrap>
-      <div>
-        <h1>Challenges</h1>
-        <div className="challenges-container overflow-auto" style={{ maxHeight: "100vh" }}>
-          {challenges.length === 0 ? (
-            <p className="text-center text-muted">No challenges available.</p>
-          ) : (
-            challenges.map((challenge) => {
-              return (
-                <ChallengeCard key={challenge.id} challenge={challenge} />
-              );
-            })
-          )}
+      <Outlet />
+      <>
+        <div>
+          <h1>Challenges</h1>
+          <div
+            className="challenges-container overflow-auto"
+            style={{ maxHeight: "100vh" }}
+          >
+            {challenges.length === 0 ? (
+              <p className="text-center text-muted">No challenges available.</p>
+            ) : (
+              challenges.map((challenge) => {
+                return (
+                  <ChallengeCard key={challenge.id} challenge={challenge} />
+                );
+              })
+            )}
+          </div>
+          <button className="btn btn-primary">
+            <a href="/createChallenge">Create Challenge</a>
+          </button>
         </div>
-        <button className="btn btn-primary"><a href="/createChallenge">Create Challenge</a></button>
-      </div>
+      </>
     </PageLoadWrap>
   );
 }

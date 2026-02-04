@@ -133,26 +133,37 @@ module.exports = {
             profileresults.next_rank_minpoints !== undefined
               ? profileresults.next_rank_minpoints - profileresults.points
               : null;
-          
+
           // Calculate percentage correctly
           const nextRankPercentage = (() => {
-            if (nextRankPoints === null || profileresults.next_rank_minpoints === undefined) {
+            if (
+              nextRankPoints === null ||
+              profileresults.next_rank_minpoints === undefined
+            ) {
               return null; // No next rank (max rank reached)
             }
-            
+
             // Total points needed from current rank to next rank
-            const totalPointsForNextRank = profileresults.next_rank_minpoints - profileresults.min_points;
-            
+            const totalPointsForNextRank =
+              profileresults.next_rank_minpoints - profileresults.min_points;
+
             // Points already earned towards next rank
-            const pointsEarnedTowardsNext = profileresults.points - profileresults.min_points;
-            
+            const pointsEarnedTowardsNext =
+              profileresults.points - profileresults.min_points;
+
             // Calculate percentage (0-100%)
             if (totalPointsForNextRank <= 0) {
               return 100; // Edge case: same rank requirements
             }
-            
-            const percentage = Math.min(100, Math.max(0, (pointsEarnedTowardsNext / totalPointsForNextRank) * 100));
-            console.log('Calculated percentage:', percentage);
+
+            const percentage = Math.min(
+              100,
+              Math.max(
+                0,
+                (pointsEarnedTowardsNext / totalPointsForNextRank) * 100,
+              ),
+            );
+            console.log("Calculated percentage:", percentage);
             return percentage;
           })();
           const profileData = {
@@ -233,9 +244,32 @@ module.exports = {
   // this model is used by the /leaderboard/position endpoint
   getleaderboardPositionbyId(userId, callback) {
     const sql = `SELECT COUNT(*) + 1 AS position FROM user u WHERE u.points > (SELECT points FROM user WHERE id = ?) OR (u.points = (SELECT points FROM user WHERE id = ?) AND u.credits > (SELECT credits FROM user WHERE id = ?));`;
-    pool.query(sql, [userId, userId, userId], (err, results) => {
+    pool.query(sql, [userId, userId, userId], (err, positionresults) => {
       if (err) return callback(err);
-      return callback(null, results);
+      const sql = `
+    SELECT 
+      u.id,
+      u.username,
+      u.points,
+      u.credits,
+      r.name AS \`rank\`
+    FROM user u
+    LEFT JOIN \`rank\` r ON u.points >= r.min_points
+    WHERE r.min_points = (
+      SELECT MAX(r2.min_points) 
+      FROM \`rank\` r2 
+      WHERE u.points >= r2.min_points
+    )
+    ORDER BY u.points DESC, u.credits DESC
+    LIMIT ?`;
+      pool.query(sql, [results[0].position], (err, userresults) => {
+        if (err) return callback(err);
+        const results = {
+          position: positionresults[0],
+          userData: userresults[0],
+        };
+        return callback(null, results);
+      });
     });
   },
   //getLeaderboardPositionbyUsername
@@ -249,10 +283,37 @@ module.exports = {
         return callback(null, null);
       }
       const sql = `SELECT COUNT(*) + 1 AS position FROM user u WHERE u.points > (SELECT points FROM user WHERE username = ?) OR (u.points = (SELECT points FROM user WHERE username = ?) AND u.credits > (SELECT credits FROM user WHERE username = ?));`;
-      pool.query(sql, [username, username, username], (err, results) => {
-        if (err) return callback(err);
-        return callback(null, results);
-      });
+      pool.query(
+        sql,
+        [username, username, username],
+        (err, positionresults) => {
+          if (err) return callback(err);
+          const sql = `
+    SELECT 
+      u.id,
+      u.username,
+      u.points,
+      u.credits,
+      r.name AS \`rank\`
+    FROM user u
+    LEFT JOIN \`rank\` r ON u.points >= r.min_points
+    WHERE r.min_points = (
+      SELECT MAX(r2.min_points) 
+      FROM \`rank\` r2 
+      WHERE u.points >= r2.min_points
+    )
+    ORDER BY u.points DESC, u.credits DESC
+    LIMIT ?`;
+          pool.query(sql, [results[0].position], (err, userresults) => {
+            if (err) return callback(err);
+            const results = {
+              position: positionresults[0],
+              userData: userresults[0],
+            };
+            return callback(null, results);
+          });
+        },
+      );
     });
   },
 };

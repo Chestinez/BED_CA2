@@ -2,14 +2,18 @@ import React from "react";
 import { useState, useEffect } from "react";
 import api from "../../services/api";
 import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
+import ContentLoadWrap from "../../components/PageLoader/ContentLoadWrap";
 import { useAuth } from "../../hooks/useAuth";
+import GetLeaderboardPosition from "../../components/leaderboard/GetLeaderboardPosition";
 
 export default function LeaderBoard() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [error, setError] = useState(null);
   const [filterCount, setFilterCount] = useState(10);
   const { setLoading } = useAuth(); // Use the same loading system as PageLoadWrap
-  
+  const { position, listLoading, fetchLeaderboardPosition } =
+    GetLeaderboardPosition();
+
   const fetchLeaderboard = async (count = 10) => {
     try {
       setError(null);
@@ -30,7 +34,7 @@ export default function LeaderBoard() {
       if (showLoader) {
         setLoading(true); // This will trigger PageLoadWrap's loader
       }
-      
+
       const res = await api.get("users/leaderboard", {
         params: { filterCount: count },
       });
@@ -85,6 +89,18 @@ export default function LeaderBoard() {
           />
         </div>
 
+        <label htmlFor="position-username" className="form-label text-white">
+          Input Username to get that user Leaderboard Position (your own
+          position by default)
+        </label>
+        <input
+          type="text"
+          placeholder="Username..."
+          id="position-username"
+          className="form-control mb-3"
+          onChange={(e) => fetchLeaderboardPosition(e.target.value)}
+        />
+
         <h2 className="text-white mb-3">
           Top {leaderboard.length} Users based on points
         </h2>
@@ -100,31 +116,36 @@ export default function LeaderBoard() {
                 <th scope="col">Credits</th>
               </tr>
             </thead>
-            <tbody>
-              {leaderboard && leaderboard.length > 0 ? (
-                leaderboard.map((user, index) => (
-                  <tr key={user.id || index}>
-                    <td>{index + 1}</td>
-                    <td>{user.username || "Unknown"}</td>
-                    <td>
-                      <span className="badge bg-primary">
-                        {user.rank || "Unranked"}
-                      </span>
+            <ContentLoadWrap>
+              <tbody>
+                {position && (
+                  <tr></tr>
+                )} 
+                {leaderboard && leaderboard.length > 0 ? (
+                  leaderboard.map((user, index) => (
+                    <tr key={user.id || index}>
+                      <td>{index + 1}</td>
+                      <td>{user.username || "Unknown"}</td>
+                      <td>
+                        <span className="badge bg-primary">
+                          {user.rank || "Unranked"}
+                        </span>
+                      </td>
+                      <td>{user.points || 0}</td>
+                      <td>{user.credits || 0}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center">
+                      {error
+                        ? "Failed to load data"
+                        : "No leaderboard data available"}
                     </td>
-                    <td>{user.points || 0}</td>
-                    <td>{user.credits || 0}</td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="text-center">
-                    {error
-                      ? "Failed to load data"
-                      : "No leaderboard data available"}
-                  </td>
-                </tr>
-              )}
-            </tbody>
+                )}
+              </tbody>
+            </ContentLoadWrap>
           </table>
         </div>
       </div>

@@ -12,12 +12,14 @@ export default function ChallengeCard({ challenge }) {
           <p>Credits: {challenge.credits_rewarded}</p>
           <p>Duration: {challenge.duration_days} days</p>
           <div>
-            <span className="badge bg-info text-dark me-2">
+            <span
+              className={`badge text-dark me-2 ${challenge.difficultyName === "Easy" ? "bg-success" : challenge.difficultyName === "Medium" ? "bg-warning" : "bg-danger"}`}
+            >
               Difficulty: {challenge.difficultyName}
             </span>
           </div>
           <p>By: {challenge.creatorName}</p>
-          <button className="btn btn-primary">Start Challenge</button>
+          <button className="btn btn-primary"><a href={`/challenges/${challenge.id}`}>Start Challenge</a></button>
         </>
       ) : (
         <>

@@ -21,7 +21,9 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/" element={<Dashboard />} />
           <Route path="/shop" element={<Shop />} />
-          <Route path="/challenges" element={<Challenges />} />
+          <Route path="/challenges" element={<Challenges />}>
+            <Route path=":id" element={<Challenges />} />
+          </Route>
           <Route path="/createChallenge" element={<CreateChallenges />} />
           <Route path="/leaderboard" element={<LeaderBoard />} />
           <Route path="/profile" element={<Profile />} />
