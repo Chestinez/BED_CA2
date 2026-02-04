@@ -244,31 +244,32 @@ module.exports = {
   // this model is used by the /leaderboard/position endpoint
   getleaderboardPositionbyId(userId, callback) {
     const sql = `SELECT COUNT(*) + 1 AS position FROM user u WHERE u.points > (SELECT points FROM user WHERE id = ?) OR (u.points = (SELECT points FROM user WHERE id = ?) AND u.credits > (SELECT credits FROM user WHERE id = ?));`;
-    pool.query(sql, [userId, userId, userId], (err, positionresults) => {
+    pool.query(sql, [userId, userId, userId], (err, positionResults) => {
       if (err) return callback(err);
-      const sql = `
-    SELECT 
-      u.id,
-      u.username,
-      u.points,
-      u.credits,
-      r.name AS \`rank\`
-    FROM user u
-    LEFT JOIN \`rank\` r ON u.points >= r.min_points
-    WHERE r.min_points = (
-      SELECT MAX(r2.min_points) 
-      FROM \`rank\` r2 
-      WHERE u.points >= r2.min_points
-    )
-    ORDER BY u.points DESC, u.credits DESC
-    LIMIT ?`;
-      pool.query(sql, [results[0].position], (err, userresults) => {
+      
+      // Get user data
+      const userSql = `
+        SELECT 
+          u.id,
+          u.username,
+          u.points,
+          u.credits,
+          r.name AS \`rank\`
+        FROM user u
+        LEFT JOIN \`rank\` r ON u.points >= r.min_points
+        WHERE u.id = ? AND r.min_points = (
+          SELECT MAX(r2.min_points) 
+          FROM \`rank\` r2 
+          WHERE u.points >= r2.min_points
+        )`;
+      
+      pool.query(userSql, [userId], (err, userResults) => {
         if (err) return callback(err);
-        const results = {
-          position: positionresults[0],
-          userData: userresults[0],
+        const responseData = {
+          position: positionResults[0].position,
+          userData: userResults[0],
         };
-        return callback(null, results);
+        return callback(null, responseData);
       });
     });
   },
@@ -286,31 +287,32 @@ module.exports = {
       pool.query(
         sql,
         [username, username, username],
-        (err, positionresults) => {
+        (err, positionResults) => {
           if (err) return callback(err);
-          const sql = `
-    SELECT 
-      u.id,
-      u.username,
-      u.points,
-      u.credits,
-      r.name AS \`rank\`
-    FROM user u
-    LEFT JOIN \`rank\` r ON u.points >= r.min_points
-    WHERE r.min_points = (
-      SELECT MAX(r2.min_points) 
-      FROM \`rank\` r2 
-      WHERE u.points >= r2.min_points
-    )
-    ORDER BY u.points DESC, u.credits DESC
-    LIMIT ?`;
-          pool.query(sql, [results[0].position], (err, userresults) => {
+          
+          // Get user data
+          const userSql = `
+            SELECT 
+              u.id,
+              u.username,
+              u.points,
+              u.credits,
+              r.name AS \`rank\`
+            FROM user u
+            LEFT JOIN \`rank\` r ON u.points >= r.min_points
+            WHERE u.username = ? AND r.min_points = (
+              SELECT MAX(r2.min_points) 
+              FROM \`rank\` r2 
+              WHERE u.points >= r2.min_points
+            )`;
+          
+          pool.query(userSql, [username], (err, userResults) => {
             if (err) return callback(err);
-            const results = {
-              position: positionresults[0],
-              userData: userresults[0],
+            const responseData = {
+              position: positionResults[0].position,
+              userData: userResults[0],
             };
-            return callback(null, results);
+            return callback(null, responseData);
           });
         },
       );

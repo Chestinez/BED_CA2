@@ -275,7 +275,8 @@ module.exports = {
         return next(new AppError("Internal Server Error", 500));
       }
       res.status(200).json({
-        position: results[0].position, // return results
+        position: results.position,
+        userData: results.userData
       });
     });
   },
@@ -286,10 +287,13 @@ module.exports = {
     userModel.getLeaderboardPositionbyUsername(username, (err, results) => {
       if (err) {
         return next(new AppError("Internal Server Error", 500));
-      } else if (!results || results.length === 0) {
+      } else if (!results) {
         return next(new AppError("user not found", 404));
       }
-      return res.status(200).json({ message: "success", results }); // return results
+      return res.status(200).json({ 
+        position: results.position,
+        userData: results.userData
+      });
     });
   },
 

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import api from "../../services/api";
 import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
 import ChallengeCard from "../../components/challenge/ChallengeCard";
-import { Outlet, Link, useParams } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 export default function Challenges() {
   const [challenges, setChallenges] = useState([]);
   useEffect(() => {

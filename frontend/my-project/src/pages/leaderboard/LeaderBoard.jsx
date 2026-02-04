@@ -1,4 +1,3 @@
-import React from "react";
 import { useState, useEffect } from "react";
 import api from "../../services/api";
 import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
@@ -10,9 +9,15 @@ export default function LeaderBoard() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [error, setError] = useState(null);
   const [filterCount, setFilterCount] = useState(10);
-  const { setLoading } = useAuth(); // Use the same loading system as PageLoadWrap
-  const { position, listLoading, fetchLeaderboardPosition } =
-    GetLeaderboardPosition();
+  const { loading, setLoading } = useAuth(); // Use the same loading system as PageLoadWrap
+  const {
+    position,
+    listLoading,
+    fetchLeaderboardPosition,
+    fetchLeaderboardPositionSelf,
+    selectedUser,
+    clearSearch,
+  } = GetLeaderboardPosition();
 
   const fetchLeaderboard = async (count = 10) => {
     try {
@@ -58,9 +63,35 @@ export default function LeaderBoard() {
   const handleFilterChange = (e) => {
     const value = parseInt(e.target.value) || 10;
     setFilterCount(value);
-    fetchLeaderboard(value, true); // Show loader for filter changes
+    clearSearch(); // Clear any search results when changing filter
+    fetchLeaderboard(value); // Show loader for filter changes
   };
 
+  const handlePositionSearch = async (username) => {
+    await fetchLeaderboardPosition(username);
+
+    // Use a small delay to ensure state has updated
+    setTimeout(() => {
+      if (position && position > filterCount) {
+        setFilterCount(position);
+        fetchLeaderboard(position);
+      }
+    }, 200);
+  };
+
+  const getRankColor = (rank) => {
+    const ranks = {
+      Recruit: "",
+      Pilot: "bg-warning",
+      Commander: "bg-danger",
+      Admiral: "bg-info",
+      "Fleet-Admiral": "bg-success",
+      "Big-Boss": "bg-dark",
+      "Eve-Maestro": "bg-secondary",
+      Jaspinos: "bg-primary",
+    };
+    return ranks[rank] || "";
+  };
   return (
     <PageLoadWrap>
       <div className="container mt-4">
@@ -90,44 +121,89 @@ export default function LeaderBoard() {
         </div>
 
         <label htmlFor="position-username" className="form-label text-white">
-          Input Username to get that user Leaderboard Position (your own
-          position by default)
+          Input Username to get that user Leaderboard Position
         </label>
-        <input
-          type="text"
-          placeholder="Username..."
-          id="position-username"
-          className="form-control mb-3"
-          onChange={(e) => fetchLeaderboardPosition(e.target.value)}
-        />
+        <div className="d-inline">
+          <input
+            type="text"
+            placeholder="Username..."
+            id="position-username"
+            className="form-control mb-3"
+          />
+          <button
+            className="btn btn-success"
+            type="button"
+            id="position-search"
+            onClick={() =>
+              handlePositionSearch(
+                document.getElementById("position-username").value,
+              )
+            }
+          >
+            Search
+          </button>
+          {(selectedUser || position) && (
+            <button
+              className="btn btn-outline-light ms-2"
+              onClick={() => {
+                document.getElementById("position-username").value = "";
+                clearSearch();
+                fetchLeaderboard(filterCount);
+              }}
+            >
+              Back to Top {filterCount}
+            </button>
+          )}
+        </div>
+
+        <button
+          className="btn btn-primary"
+          onClick={fetchLeaderboardPositionSelf}
+        >
+          Get Your Leaderboard Position
+        </button>
 
         <h2 className="text-white mb-3">
           Top {leaderboard.length} Users based on points
         </h2>
 
         <div className="table-responsive">
-          <table className="table table-dark table-striped">
-            <thead>
-              <tr>
-                <th scope="col">No.</th>
-                <th scope="col">Username</th>
-                <th scope="col">Rank</th>
-                <th scope="col">Points</th>
-                <th scope="col">Credits</th>
-              </tr>
-            </thead>
-            <ContentLoadWrap>
+          <ContentLoadWrap isLoading={loading || listLoading}>
+            <table className="table table-dark table-striped">
+              <thead>
+                <tr>
+                  <th scope="col" className="fw-bold">
+                    #
+                  </th>
+                  <th scope="col">Username</th>
+                  <th scope="col">Rank</th>
+                  <th scope="col">Points</th>
+                  <th scope="col">Credits</th>
+                </tr>
+              </thead>
+
               <tbody>
-                {position && (
-                  <tr></tr>
-                )} 
-                {leaderboard && leaderboard.length > 0 ? (
+                {position && selectedUser ? (
+                  <tr>
+                    <td className="fw-bold">{position}</td>
+                    <td>{selectedUser.username || "Unknown"}</td>
+                    <td>
+                      <span
+                        className={`badge ${getRankColor(selectedUser.rank)}`}
+                      >
+                        {selectedUser.rank || "Unranked"}
+                      </span>
+                    </td>
+                    <td>{selectedUser.points || 0}</td>
+                    <td>{selectedUser.credits || 0}</td>
+                  </tr>
+                ) : leaderboard && leaderboard.length > 0 ? (
                   leaderboard.map((user, index) => (
                     <tr key={user.id || index}>
-                      <td>{index + 1}</td>
+                      <td className="fw-bold">{index + 1}</td>
                       <td>{user.username || "Unknown"}</td>
                       <td>
-                        <span className="badge bg-primary">
+                        <span className={`badge ${getRankColor(user.rank)}`}>
                           {user.rank || "Unranked"}
                         </span>
                       </td>
@@ -145,8 +221,8 @@ export default function LeaderBoard() {
                   </tr>
                 )}
               </tbody>
-            </ContentLoadWrap>
-          </table>
+            </table>
+          </ContentLoadWrap>
         </div>
       </div>
     </PageLoadWrap>
