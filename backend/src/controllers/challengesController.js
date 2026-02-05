@@ -164,7 +164,7 @@ module.exports = {
     // startChallenge
     const challengeId = req.params.id;
     const userId = req.userId;
-    const notes = req.body.notes || null; // if no notes, set to null
+    const notes = req.body.notes || null; // notes are optional when starting
 
     challengeModels.startChallenge(
       userId,
@@ -178,8 +178,8 @@ module.exports = {
         }
 
         return res.status(201).json({
-          message: `Challenge ${challengeId} Started!`, // return results
-          completionId: results.completedId,
+          message: `Challenge ${challengeId} Started!`,
+          completionId: results.insertId,
         });
       }
     );
@@ -187,20 +187,24 @@ module.exports = {
   completeChallenge(req, res, next) {
     // completeChallenge
     const challengeId = req.params.id;
-    const notes = req.body.notes || null; // if no notes, set to null
+    const notes = req.body.notes;
     const userId = req.userId;
+
+    // Require completion notes
+    if (!notes || !notes.trim()) {
+      return next(new AppError("Please provide completion notes describing what you accomplished", 400));
+    }
 
     const data = {
       userId,
       challengeId,
-      completionNotes: notes,
+      completionNotes: notes.trim(),
     };
 
     challengeModels.completechallenge(data, (err, results) => {
       if (err) {
         return next(new AppError("Error completing challenge", 500));
       } else if (!results || results.affectedRows === 0) {
-        // if no results or affected rows, challenge not found
         return next(
           new AppError("Challenge already completed or not started", 400)
         );
@@ -208,7 +212,7 @@ module.exports = {
 
       res.status(201).json({
         message: `Challenge ${challengeId} Completed!`,
-        newTotalPoints: results.newPoints, // return results
+        newTotalPoints: results.newPoints,
         newTotalCredits: results.newCredits,
       });
     });

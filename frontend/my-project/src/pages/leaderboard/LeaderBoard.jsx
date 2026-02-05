@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import api from "../../services/api";
 import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
 import ContentLoadWrap from "../../components/PageLoader/ContentLoadWrap";
@@ -186,7 +187,14 @@ export default function LeaderBoard() {
                 {position && selectedUser ? (
                   <tr>
                     <td className="fw-bold">{position}</td>
-                    <td>{selectedUser.username || "Unknown"}</td>
+                    <td>
+                      <Link 
+                        to={`/profile/${selectedUser.username}`}
+                        className="text-decoration-none text-info"
+                      >
+                        {selectedUser.username || "Unknown"}
+                      </Link>
+                    </td>
                     <td>
                       <span
                         className={`badge ${getRankColor(selectedUser.rank)}`}
@@ -201,7 +209,14 @@ export default function LeaderBoard() {
                   leaderboard.map((user, index) => (
                     <tr key={user.id || index}>
                       <td className="fw-bold">{index + 1}</td>
-                      <td>{user.username || "Unknown"}</td>
+                      <td>
+                        <Link 
+                          to={`/profile/${user.username}`}
+                          className="text-decoration-none text-info"
+                        >
+                          {user.username || "Unknown"}
+                        </Link>
+                      </td>
                       <td>
                         <span className={`badge ${getRankColor(user.rank)}`}>
                           {user.rank || "Unranked"}

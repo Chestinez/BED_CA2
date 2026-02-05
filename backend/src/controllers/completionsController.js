@@ -29,4 +29,20 @@ module.exports = {
       res.status(200).json(results); // return results
     });
   },
+
+  getPendingMissions(req, res, next) {
+    // getPendingMissions
+    const userId = req.userId;
+
+    completionsModel.getUserPendingMissions(userId, (err, results) => {
+      // this model is used to get all pending challenges for a user
+      if (err) return next(new AppError("Internal Server Error", 500));
+
+      res.status(200).json({
+        userId: userId,
+        results: results,
+        count: results.length,
+      });
+    });
+  },
 };

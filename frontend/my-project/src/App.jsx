@@ -10,6 +10,8 @@ import Challenges from "./pages/challenges/Challenges";
 import LeaderBoard from "./pages/leaderboard/LeaderBoard";
 import Profile from "./pages/Inventory/Profile";
 import CreateChallenges from "./pages/challenges/CreateChallenges";
+import ChallengeDetails from "./pages/challenges/ChallengeDetails";
+import Inventory from "./pages/Inventory/Inventory";
 
 export default function App() {
   return (
@@ -21,12 +23,13 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/" element={<Dashboard />} />
           <Route path="/shop" element={<Shop />} />
-          <Route path="/challenges" element={<Challenges />}>
-            <Route path=":id" element={<Challenges />} />
-          </Route>
+          <Route path="/challenges" element={<Challenges />} />
+          <Route path="/challenges/:id" element={<ChallengeDetails />} />
           <Route path="/createChallenge" element={<CreateChallenges />} />
           <Route path="/leaderboard" element={<LeaderBoard />} />
+          <Route path="/inventory" element={<Inventory />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/:username" element={<Profile />} />
         </Route>
 
         <Route path="*" element={<h1>404 - Page not found</h1>} />

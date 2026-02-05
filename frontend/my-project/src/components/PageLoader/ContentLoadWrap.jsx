@@ -2,7 +2,7 @@ import React from "react";
 
 export default function ContentLoadWrap({ children, isLoading }) {
   return (
-    <div className="position-relative  d-flex justify-content-center align-items-center m-5">
+    <div className="position-relative d-flex justify-content-center align-items-center m-5">
       {isLoading ? (
         <div className="d-flex flex-column align-items-center justify-content-center">
           <div

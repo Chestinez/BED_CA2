@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Navbar() {
   return (
     <div
@@ -6,23 +8,26 @@ function Navbar() {
     >
       <h3 className="mb-5 neon-text">Welcome</h3>
       <nav className="nav flex-column">
-        <a className="nav-link text-white active" href="/dashboard">
+        <Link className="nav-link text-white active" to="/dashboard">
           Dashboard
-        </a>
+        </Link>
         {/* TODO: Implement these pages or remove these links */}
-        <a className="nav-link text-white" href="/shop">
+        <Link className="nav-link text-white" to="/shop">
           Shop
-        </a>
-        {/* <a className="nav-link text-white" href="#">Challenges</a> */}
-        <a className="nav-link text-white" href="/challenges">
+        </Link>
+        {/* <Link className="nav-link text-white" to="#">Challenges</Link> */}
+        <Link className="nav-link text-white" to="/challenges">
           Challenges
-        </a>
-        <a className="nav-link text-white" href="/leaderboard">
+        </Link>
+        <Link className="nav-link text-white" to="/leaderboard">
           Leaderboard
-        </a>
-        <a className="nav-link text-white" href="/profile">
+        </Link>
+        <Link className="nav-link text-white" to="/profile">
           Profile
-        </a>
+        </Link>
+        <Link className="nav-link text-white" to="/inventory">
+          Inventory
+        </Link>
       </nav>
     </div>
   );
