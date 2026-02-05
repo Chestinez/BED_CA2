@@ -10,9 +10,8 @@ export default function Dashboard() {
   const { user, logout } = useAuth();
   const dashRef = useRef();
 
-  const userProfile = user
-    ? JSON.parse(localStorage.getItem("userData"))[0]
-    : null;
+  // Use live user data from auth context instead of localStorage
+  const userProfile = user || null;
 
   // Calculate rank progression
   const getRankProgression = () => {

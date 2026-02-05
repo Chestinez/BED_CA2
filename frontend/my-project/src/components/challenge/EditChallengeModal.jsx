@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Edit3 } from "lucide-react";
 
 export default function EditChallengeModal({ challenge, difficulties, onSave, onClose }) {
@@ -13,23 +13,66 @@ export default function EditChallengeModal({ challenge, difficulties, onSave, on
     is_active: challenge.is_active
   });
   const [validationError, setValidationError] = useState("");
+  const [isValid, setIsValid] = useState(true);
 
   const getCurrentDifficulty = () => {
     return difficulties.find(d => d.id == formData.difficulty_id) || { name: "Unknown", min_value: 0 };
   };
 
-  const validateRewards = () => {
-    const totalRewards = parseInt(formData.points_rewarded) + parseInt(formData.credits_rewarded);
-    const selectedDifficulty = getCurrentDifficulty();
+  const validateRewards = (currentFormData = formData) => {
+    const points = parseInt(currentFormData.points_rewarded || 0);
+    const credits = parseInt(currentFormData.credits_rewarded || 0);
+    const totalRewards = points + credits;
+    const selectedDifficulty = difficulties.find(d => d.id == currentFormData.difficulty_id) || { name: "Unknown", min_value: 0 };
     
-    if (totalRewards < selectedDifficulty.min_value) {
+    console.log("Validating:", { points, credits, totalRewards, difficulty: selectedDifficulty.name });
+    
+    // Check individual limits first
+    if (points >= 90) {
+      setValidationError("❌ Points cannot exceed 90");
+      setIsValid(false);
+      return false;
+    }
+    
+    if (credits >= 60) {
+      setValidationError("❌ Credits cannot exceed 60");
+      setIsValid(false);
+      return false;
+    }
+    
+    // Check difficulty range limits
+    let maxAllowed = Infinity;
+    let minRequired = 0;
+    
+    if (selectedDifficulty.id == 1) { // Easy
+      minRequired = 0;
+      maxAllowed = 50;
+    } else if (selectedDifficulty.id == 2) { // Medium
+      minRequired = 51;
+      maxAllowed = 100;
+    } else if (selectedDifficulty.id == 3) { // Hard
+      minRequired = 101;
+      maxAllowed = Infinity; // No upper limit for Hard
+    }
+    
+    if (totalRewards > maxAllowed) {
       setValidationError(
-        `${selectedDifficulty.name} difficulty requires a minimum total of ${selectedDifficulty.min_value} points + credits. Current total: ${totalRewards}`
+        `❌ ${selectedDifficulty.name} difficulty allows a maximum of ${maxAllowed} total rewards. Current: ${totalRewards}. Consider using a higher difficulty.`
       );
+      setIsValid(false);
+      return false;
+    }
+    
+    if (totalRewards < minRequired) {
+      setValidationError(
+        `❌ ${selectedDifficulty.name} difficulty requires a minimum of ${minRequired} total rewards. Current: ${totalRewards}. This challenge will be set to INACTIVE until fixed.`
+      );
+      setIsValid(false);
       return false;
     }
     
     setValidationError("");
+    setIsValid(true);
     return true;
   };
 
@@ -41,26 +84,36 @@ export default function EditChallengeModal({ challenge, difficulties, onSave, on
     
     setFormData(newFormData);
     
-    // Trigger validation after state update
-    setTimeout(() => {
-      validateRewards();
-    }, 0);
+    // Validate immediately with the new form data
+    validateRewards(newFormData);
   };
+
+  // Validate on mount and when difficulties change
+  useEffect(() => {
+    if (difficulties.length > 0) {
+      validateRewards();
+    }
+  }, [difficulties]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     
     console.log("Form submitted with data:", formData);
-    console.log("Validation check result:", validateRewards());
     
-    // Validate rewards before submitting
-    if (!validateRewards()) {
-      console.log("Validation failed, not submitting");
-      return;
+    // Final validation
+    const isCurrentlyValid = validateRewards(formData);
+    
+    // If invalid, automatically set is_active to "0"
+    const finalFormData = {
+      ...formData,
+      is_active: isCurrentlyValid ? formData.is_active : "0"
+    };
+    
+    if (!isCurrentlyValid) {
+      console.log("Challenge is invalid, setting to inactive");
     }
     
-    console.log("Validation passed, submitting");
-    onSave(formData);
+    onSave(finalFormData);
   };
 
   return (
@@ -78,8 +131,13 @@ export default function EditChallengeModal({ challenge, difficulties, onSave, on
             <div className="modal-body">
               {/* Validation Error */}
               {validationError && (
-                <div className="alert alert-danger mb-3">
+                <div className={`alert ${isValid ? 'alert-success' : 'alert-danger'} mb-3`}>
                   {validationError}
+                  {!isValid && (
+                    <div className="mt-2 small">
+                      <strong>Note:</strong> This challenge will be automatically set to INACTIVE if you save these values.
+                    </div>
+                  )}
                 </div>
               )}
               
@@ -115,7 +173,7 @@ export default function EditChallengeModal({ challenge, difficulties, onSave, on
                       type="number"
                       value={formData.points_rewarded}
                       onChange={handleChange}
-                      className="form-control bg-dark text-white border-secondary"
+                      className={`form-control bg-dark text-white ${!isValid ? 'border-danger' : 'border-secondary'}`}
                       min="0"
                     />
                   </div>
@@ -126,15 +184,15 @@ export default function EditChallengeModal({ challenge, difficulties, onSave, on
                       type="number"
                       value={formData.credits_rewarded}
                       onChange={handleChange}
-                      className="form-control bg-dark text-white border-secondary"
+                      className={`form-control bg-dark text-white ${!isValid ? 'border-danger' : 'border-secondary'}`}
                       min="0"
                     />
                   </div>
                   
                   {/* Real-time total display */}
-                  <div className="mb-3 p-2 bg-secondary rounded">
+                  <div className={`mb-3 p-2 rounded ${!isValid ? 'bg-danger bg-opacity-25 border border-danger' : 'bg-secondary'}`}>
                     <small className="text-light">
-                      Total: {parseInt(formData.points_rewarded || 0) + parseInt(formData.credits_rewarded || 0)} 
+                      <strong>Total: {parseInt(formData.points_rewarded || 0) + parseInt(formData.credits_rewarded || 0)}</strong>
                       <span className="text-muted d-block">
                         Min for {getCurrentDifficulty().name}: {getCurrentDifficulty().min_value}
                       </span>
@@ -174,10 +232,16 @@ export default function EditChallengeModal({ challenge, difficulties, onSave, on
                       value={formData.is_active}
                       onChange={handleChange}
                       className="form-select bg-dark text-white border-secondary"
+                      disabled={!isValid} // Disable if invalid - will be set to inactive automatically
                     >
                       <option value="1">Active</option>
                       <option value="0">Inactive</option>
                     </select>
+                    {!isValid && (
+                      <small className="text-danger">
+                        Status will be set to INACTIVE due to validation errors
+                      </small>
+                    )}
                   </div>
                 </div>
               </div>
@@ -188,10 +252,9 @@ export default function EditChallengeModal({ challenge, difficulties, onSave, on
               </button>
               <button 
                 type="submit" 
-                className="btn btn-primary"
-                disabled={validationError}
+                className={`btn ${isValid ? 'btn-primary' : 'btn-warning'}`}
               >
-                {validationError ? "Fix Validation Errors" : "Save Changes"}
+                {isValid ? 'Save Changes' : 'Save as Inactive'}
               </button>
             </div>
           </form>

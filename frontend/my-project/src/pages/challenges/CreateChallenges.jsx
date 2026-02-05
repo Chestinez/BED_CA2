@@ -52,17 +52,51 @@ export default function CreateChallenges() {
   };
 
   const validateRewards = () => {
-    const totalRewards =
-      parseInt(formData.points_rewarded) + parseInt(formData.credits_rewarded);
+    const totalRewards = parseInt(formData.points_rewarded || 0) + parseInt(formData.credits_rewarded || 0);
+    const points = parseInt(formData.points_rewarded || 0);
+    const credits = parseInt(formData.credits_rewarded || 0);
     const selectedDifficulty = getCurrentDifficulty();
-
-    if (totalRewards < selectedDifficulty.min_value) {
+    
+    // Individual limits validation
+    if (points >= 90) {
+      setValidationError("Points cannot exceed 90");
+      return false;
+    }
+    
+    if (credits >= 60) {
+      setValidationError("Credits cannot exceed 60");
+      return false;
+    }
+    
+    // Difficulty range validation
+    let minRequired = 0;
+    let maxAllowed = Infinity;
+    
+    if (selectedDifficulty.id == 1) { // Easy
+      minRequired = 0;
+      maxAllowed = 50;
+    } else if (selectedDifficulty.id == 2) { // Medium
+      minRequired = 51;
+      maxAllowed = 100;
+    } else if (selectedDifficulty.id == 3) { // Hard
+      minRequired = 101;
+      maxAllowed = Infinity;
+    }
+    
+    if (totalRewards < minRequired) {
       setValidationError(
-        `${selectedDifficulty.name} difficulty requires a minimum total of ${selectedDifficulty.min_value} points + credits. Current total: ${totalRewards}`,
+        `${selectedDifficulty.name} difficulty requires a minimum of ${minRequired} total points + credits. Current total: ${totalRewards}`
       );
       return false;
     }
-
+    
+    if (totalRewards > maxAllowed) {
+      setValidationError(
+        `${selectedDifficulty.name} difficulty allows a maximum of ${maxAllowed} total points + credits. Current total: ${totalRewards}. Consider using a higher difficulty.`
+      );
+      return false;
+    }
+    
     setValidationError("");
     return true;
   };
@@ -93,6 +127,8 @@ export default function CreateChallenges() {
       const response = await api.post("/challenges/create", formData);
       console.log("Challenge created successfully:", response.data);
       setShowPopUp(true);
+      setValidationError(""); // Clear any previous errors
+      
       // Reset form
       setFormData({
         title: "",
@@ -106,7 +142,10 @@ export default function CreateChallenges() {
     } catch (err) {
       console.error("Error creating challenge:", err);
       console.error("Error response:", err.response?.data);
-      setValidationError(err.response?.data?.message || "Failed to create challenge. Please try again.");
+      
+      // Show server validation errors
+      const errorMessage = err.response?.data?.message || "Failed to create challenge. Please try again.";
+      setValidationError(errorMessage);
     }
   };
 

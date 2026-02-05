@@ -44,7 +44,7 @@ module.exports = {
     });
   },
   createChallenge(req, res, next) {
-    // createChallenge
+    // createChallenge - COMPREHENSIVE validation for new challenges
     const {
       title,
       description,
@@ -55,42 +55,85 @@ module.exports = {
       is_active,
     } = req.body; // destructure body
     const creator_id = req.userId;
-    
+
     if (
       !title ||
       points_rewarded === undefined ||
       credits_rewarded === undefined ||
       !difficulty_id
     ) {
-      return next(new AppError("missing required input", 404));
+      return next(new AppError("missing required input", 400));
+    }
+
+    const points = parseInt(points_rewarded) || 0;
+    const credits = parseInt(credits_rewarded) || 0;
+    const totalValue = points + credits;
+    
+    // Validation 1: Individual limits (existing logic)
+    if (points >= 90) {
+      return next(new AppError("Points cannot exceed 90", 400));
+    }
+    if (credits >= 60) {
+      return next(new AppError("Credits cannot exceed 60", 400));
+    }
+    
+    // Validation 2: Difficulty requirements
+    let minRequired = 0;
+    let maxAllowed = Infinity;
+    let difficultyName = "Unknown";
+    
+    if (difficulty_id == 1) { // Easy
+      minRequired = 0;
+      maxAllowed = 50;
+      difficultyName = "Easy";
+    } else if (difficulty_id == 2) { // Medium  
+      minRequired = 51;
+      maxAllowed = 100;
+      difficultyName = "Medium";
+    } else if (difficulty_id == 3) { // Hard
+      minRequired = 101;
+      maxAllowed = 200; // No upper limit for Hard
+      difficultyName = "Hard";
+    }
+    
+    if (totalValue < minRequired) {
+      return next(new AppError(`${difficultyName} difficulty requires a minimum of ${minRequired} total points + credits. Current total: ${totalValue}`, 400));
+    }
+    
+    if (totalValue > maxAllowed) {
+      return next(new AppError(`${difficultyName} difficulty allows a maximum of ${maxAllowed} total points + credits. Current total: ${totalValue}. Consider using a higher difficulty.`, 400));
     }
 
     const data = {
       // data with required fields and defaults
       title,
       description: description || null,
-      points_rewarded: points_rewarded || 0,
-      credits_rewarded: credits_rewarded || 0,
+      points_rewarded: points,
+      credits_rewarded: credits,
       creator_id,
-      difficulty_id: difficulty_id, // Use the difficulty_id from frontend
+      difficulty_id: difficulty_id,
       duration_days: duration_days || 1,
       is_active: is_active || "1",
     };
-    
+
     challengeModels.createChallenge(difficulty_id, data, (err, results) => {
       // create challenge
       if (err) {
-        return next(new AppError("Internal Server Error", 503));
+        return next(new AppError(err.message || "Internal Server Error", 500));
       }
+      
+      // Safely access insertId
+      const insertId = results && results.results && results.results.insertId ? results.results.insertId : null;
+      
       return res.status(201).json({
         message: "new challenge created",
-        resultsId: results.results.insertId,
-        difficulty: results.difficultyresults, // return results
+        resultsId: insertId,
+        difficulty: results.difficultyresults,
       });
     });
   },
   updateChallenge(req, res, next) {
-    // updateChallenge
+    // updateChallenge - FLEXIBLE validation for editing existing challenges
     const challengeId = req.params.id;
     const userId = req.userId;
     const {
@@ -104,15 +147,45 @@ module.exports = {
     } = req.body; // destructure body
 
     if (!is_active || !title || !difficulty_id) {
-      return next(new AppError("Missing Required Data", 404)); // check for missing required input
+      return next(new AppError("Missing Required Data", 400)); // check for missing required input
+    }
+
+    // FLEXIBLE validation for editing - allow existing challenges to be updated
+    // even if they don't meet current difficulty requirements
+    console.log("Updating challenge with flexible validation");
+
+    const points = parseInt(points_rewarded) || 0;
+    const credits = parseInt(credits_rewarded) || 0;
+    const totalValue = points + credits;
+    
+    // Only check individual limits for editing (more flexible)
+    if (points >= 90) {
+      return next(new AppError("Points cannot exceed 90", 400));
+    }
+    if (credits >= 60) {
+      return next(new AppError("Credits cannot exceed 60", 400));
+    }
+    
+    // Check difficulty maximum limits (but allow flexibility)
+    let maxAllowed = Infinity;
+    if (difficulty_id == 1) { // Easy
+      maxAllowed = 50;
+    } else if (difficulty_id == 2) { // Medium  
+      maxAllowed = 100;
+    } else if (difficulty_id == 3) { // Hard
+      maxAllowed = Infinity; // No upper limit for Hard
+    }
+    
+    if (totalValue > maxAllowed) {
+      return next(new AppError(`Total rewards (${totalValue}) exceed the maximum allowed for this difficulty (${maxAllowed}). Consider using a higher difficulty.`, 400));
     }
 
     const data = {
       // data with required fields and defaults
       title,
       description: description || null,
-      points_rewarded: points_rewarded || 0,
-      credits_rewarded: credits_rewarded || 0,
+      points_rewarded: points,
+      credits_rewarded: credits,
       duration_days: duration_days || 1,
       difficulty_id: difficulty_id, // Use the difficulty_id from frontend
       is_active: is_active.toString() || "1", // convert to string as is_active is enum
@@ -125,17 +198,24 @@ module.exports = {
       challengeId,
       data,
       (err, results) => {
-        if (err) return next(new AppError("Internal Server Error", 503));
-        else if (results.affectedRows === 0) {
+        if (err) {
+          return next(new AppError(err.message || "Internal Server Error", 500));
+        }
+        
+        // Safely access affectedRows
+        const affectedRows = results && results.results && results.results.affectedRows !== undefined ? results.results.affectedRows : 0;
+        
+        if (affectedRows === 0) {
           return next(new AppError("challenge not found", 404)); // if no affected results, challenge not found
         }
+        
         return res.status(200).json({
           message: "challenge updated",
           challengeId,
-          affectedRows: results.affectedRows,
+          affectedRows: affectedRows,
           difficulty: results.difficultyresults, // return results
         });
-      }
+      },
     );
   },
   deleteChallenge(req, res, next) {
@@ -169,11 +249,14 @@ module.exports = {
           return res.status(400).json(results);
         }
 
+        // Safely access insertId
+        const insertId = results && results.insertId ? results.insertId : null;
+
         return res.status(201).json({
           message: `Challenge ${challengeId} Started!`,
-          completionId: results.insertId,
+          completionId: insertId,
         });
-      }
+      },
     );
   },
   completeChallenge(req, res, next) {
@@ -184,7 +267,12 @@ module.exports = {
 
     // Require completion notes
     if (!notes || !notes.trim()) {
-      return next(new AppError("Please provide completion notes describing what you accomplished", 400));
+      return next(
+        new AppError(
+          "Please provide completion notes describing what you accomplished",
+          400,
+        ),
+      );
     }
 
     const data = {
@@ -198,7 +286,7 @@ module.exports = {
         return next(new AppError("Error completing challenge", 500));
       } else if (!results || results.affectedRows === 0) {
         return next(
-          new AppError("Challenge already completed or not started", 400)
+          new AppError("Challenge already completed or not started", 400),
         );
       }
 
@@ -222,17 +310,35 @@ module.exports = {
           return next(
             new AppError(
               "Error retrieving completed challenge log and users",
-              500
-            )
+              500,
+            ),
           );
         } else if (!results || results.length === 0) {
           return next(
-            new AppError("No completions found for this challenge", 404) // if no results, no completions found
+            new AppError("No completions found for this challenge", 404), // if no results, no completions found
           );
         }
 
         res.status(200).json(results); // return results
-      }
+      },
     );
+  },
+
+  abandonChallenge(req, res, next) {
+    // abandonChallenge - Cancel/abandon a pending challenge
+    const challengeId = req.params.id;
+    const userId = req.userId;
+
+    challengeModels.abandonChallenge(userId, challengeId, (err, results) => {
+      if (err) {
+        return next(new AppError("Error abandoning challenge", 500));
+      } else if (results.affectedRows === 0) {
+        return next(new AppError("No pending challenge found to abandon", 404));
+      }
+
+      res.status(200).json({
+        message: `Challenge ${challengeId} abandoned successfully`,
+      });
+    });
   },
 };

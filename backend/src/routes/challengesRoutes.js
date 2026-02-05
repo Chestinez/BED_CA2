@@ -25,6 +25,8 @@ router.post("/:id/start", auth, isActive, controllers.startChallenge);
 router.post("/start", MissingChallengeIdError);
 router.post("/:id/complete", auth, isActive, controllers.completeChallenge);
 router.post("/complete", MissingChallengeIdError);
+router.post("/:id/abandon", auth, controllers.abandonChallenge);
+router.post("/abandon", MissingChallengeIdError);
 //put requests
 router.put("/update/:id", auth, ownership, controllers.updateChallenge);
 router.put("/update/", MissingChallengeIdError);

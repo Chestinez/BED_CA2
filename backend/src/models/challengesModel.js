@@ -71,15 +71,21 @@ module.exports = {
   // to first create a record, and the other to dynamically get the name and id of the difficulty
   createChallenge(difficultyId, data, callback) {
     const sql = "INSERT INTO challenges SET ?";
+    
+    // Check individual limits (keep existing validation)
     if (data.points_rewarded >= 90 || data.credits_rewarded >= 60) {
-      // restrictions are applied to prevent overloading on points and credits on a single challenge
-      return callback(null, {
-        message:
-          "Points and Credits cannot be more than 90 and 60 respectively",
-      });
+      // Return as an error, not a success with message
+      return callback(new Error("Points cannot exceed 90 and Credits cannot exceed 60"));
     }
+    
     pool.query(sql, data, (err, results) => {
       if (err) return callback(err);
+      
+      // Ensure results has insertId
+      if (!results || typeof results.insertId === 'undefined') {
+        return callback(new Error("Failed to create challenge - no insertId returned"));
+      }
+      
       const sql = "SELECT id, name FROM difficulty WHERE id = ?";
       pool.query(sql, [difficultyId], (err, difficultyresults) => {
         if (err) return callback(err);
@@ -95,16 +101,19 @@ module.exports = {
   // to first update a record, and the other to dynamically get the name and id of the difficulty
   updateChallenge(difficultyId, userId, id, data, callback) {
     const sql = `UPDATE challenges SET ? WHERE id = ? AND creator_id = ?`;
-    if (data.points_rewarded >= 90 || data.credits_rewarded >= 60) {
-      // restrictions are applied to prevent overloading on points and credits on a single challenge
-      return callback(null, {
-        message:
-          "Points and Credits cannot be more than 90 and 60 respectively",
-      });
-    }
+    
+    // Remove old individual limits validation for editing - let controller handle it
+    // This allows more flexible editing while controller enforces proper limits
+    
     const values = [data, id, userId];
     pool.query(sql, values, (err, results) => {
       if (err) return callback(err);
+      
+      // Ensure results has affectedRows
+      if (!results || typeof results.affectedRows === 'undefined') {
+        return callback(new Error("Failed to update challenge - no affectedRows returned"));
+      }
+      
       const sql = "SELECT id, name FROM difficulty WHERE id = ?";
       pool.query(sql, [difficultyId], (err, difficultyresults) => {
         if (err) return callback(err);
@@ -249,6 +258,17 @@ module.exports = {
     WHERE uc.challenge_id = ? AND uc.status = 'completed'`;
 
     pool.query(sql, [challengeId], (err, results) => {
+      if (err) return callback(err);
+      return callback(null, results);
+    });
+  },
+
+  //abandonChallenge
+  // this model is used to abandon/ a pending challenge
+  // this model is used by the /:id/abandon endpoint
+  abandonChallenge(userId, challengeId, callback) {
+    const sql = `DELETE FROM user_completions WHERE user_id = ? AND challenge_id = ? AND status = 'pending'`;
+    pool.query(sql, [userId, challengeId], (err, results) => {
       if (err) return callback(err);
       return callback(null, results);
     });

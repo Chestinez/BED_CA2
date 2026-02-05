@@ -8,7 +8,7 @@ import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
 
 export default function Profile() {
   const { username } = useParams();
-  const { user } = useAuth();
+  const { user, refreshUserData } = useAuth();
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -86,12 +86,36 @@ export default function Profile() {
       alert(
         `Challenge completed! You earned ${response.data.newTotalPoints} points and ${response.data.newTotalCredits} credits!`,
       );
+      
+      // Refresh user data to update dashboard stats
+      await refreshUserData();
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Failed to complete challenge";
       alert(errorMessage);
     } finally {
       setIsCompleting(false);
+    }
+  };
+
+  const handleAbandonChallenge = async (challengeId, challengeTitle) => {
+    if (!confirm(`Are you sure you want to abandon "${challengeTitle}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      await api.post(`/challenges/${challengeId}/abandon`);
+      
+      // Remove abandoned challenge from list
+      setPendingChallenges((prev) =>
+        prev.filter((challenge) => challenge.challenge_id !== challengeId),
+      );
+
+      alert("Challenge abandoned successfully.");
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to abandon challenge";
+      alert(errorMessage);
     }
   };
 
@@ -429,13 +453,22 @@ export default function Profile() {
                               </span>
                             </div>
 
-                            <button
-                              className="btn btn-success btn-sm w-100"
-                              onClick={() => openCompletionModal(challenge)}
-                            >
-                              <CheckCircle size={16} className="me-1" />
-                              Complete Challenge
-                            </button>
+                            <div className="d-flex gap-2">
+                              <button
+                                className="btn btn-success btn-sm flex-fill"
+                                onClick={() => openCompletionModal(challenge)}
+                              >
+                                <CheckCircle size={16} className="me-1" />
+                                Complete
+                              </button>
+                              <button
+                                className="btn btn-outline-danger btn-sm"
+                                onClick={() => handleAbandonChallenge(challenge.challenge_id, challenge.title)}
+                                title="Abandon Challenge"
+                              >
+                                <X size={16} />
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>

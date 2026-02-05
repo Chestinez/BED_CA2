@@ -22,9 +22,11 @@ export const AuthProvider = ({ children }) => {
     const initializeAuth = async () => {
       try {
         const res = await authApi.get("/users/profile/me");
-        setUser(res.data.results);
+        // Fix: Extract user data from array format [userData]
+        const userData = Array.isArray(res.data.results) ? res.data.results[0] : res.data.results;
+        setUser(userData);
         setIsAuthenticated(true);
-        localStorage.setItem("userData", JSON.stringify(res.data.results));
+        localStorage.setItem("userData", JSON.stringify(userData));
 
         // If user is authenticated and on login/register page, redirect to dashboard
         if (
@@ -49,15 +51,35 @@ export const AuthProvider = ({ children }) => {
   const verifyUser = async () => {
     try {
       const res = await authApi.get("/users/profile/me");
-      setUser(res.data.results);
+      // Fix: Extract user data from array format [userData]
+      const userData = Array.isArray(res.data.results) ? res.data.results[0] : res.data.results;
+      setUser(userData);
       setIsAuthenticated(true);
+      // Update localStorage with fresh data
+      localStorage.setItem("userData", JSON.stringify(userData));
       return true;
     } catch (err) {
       setUser(null);
       setIsAuthenticated(false);
+      localStorage.removeItem("userData");
       return false;
     } finally {
       setLoading(false);
+    }
+  };
+
+  const refreshUserData = async () => {
+    // Force refresh user data (useful after completing challenges)
+    try {
+      const res = await authApi.get("/users/profile/me");
+      // Fix: Extract user data from array format [userData]
+      const userData = Array.isArray(res.data.results) ? res.data.results[0] : res.data.results;
+      setUser(userData);
+      localStorage.setItem("userData", JSON.stringify(userData));
+      return true;
+    } catch (err) {
+      console.error("Failed to refresh user data:", err);
+      return false;
     }
   };
 
@@ -125,6 +147,7 @@ export const AuthProvider = ({ children }) => {
     setNotifications,
     register,
     verifyUser, // Expose verifyUser for manual calls
+    refreshUserData, // Expose refreshUserData for updating stats
     showPopUp,
     popUp,
   };

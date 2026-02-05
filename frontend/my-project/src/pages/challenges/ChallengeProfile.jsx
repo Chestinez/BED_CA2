@@ -91,6 +91,9 @@ export default function ChallengeProfile() {
 
   const handleEditChallenge = async (challengeData) => {
     try {
+      const originalChallenge = challenges.find(c => c.id === challengeData.id);
+      const wasSetToInactive = originalChallenge.is_active === "1" && challengeData.is_active === "0";
+      
       const response = await api.put(`/challenges/update/${challengeData.id}`, challengeData);
       console.log("Update response:", response.data);
       
@@ -98,7 +101,12 @@ export default function ChallengeProfile() {
       await fetchUserChallenges();
       
       setEditingChallenge(null);
-      showNotification("Challenge updated successfully", "success");
+      
+      if (wasSetToInactive) {
+        showNotification("Challenge updated but set to INACTIVE due to validation issues. Fix the rewards to reactivate.", "warning");
+      } else {
+        showNotification("Challenge updated successfully", "success");
+      }
     } catch (error) {
       console.error("Error updating challenge:", error);
       const errorMessage = error.response?.data?.message || "Failed to update challenge";
