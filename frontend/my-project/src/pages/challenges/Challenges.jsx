@@ -27,6 +27,18 @@ export default function Challenges() {
     fetchChallenges();
   }, []);
 
+  const handleChallengeUpdate = (challengeId, updatedChallenge) => {
+    if (updatedChallenge === null) {
+      // Challenge was deleted
+      setChallenges(challenges.filter(c => c.id !== challengeId));
+    } else {
+      // Challenge was updated
+      setChallenges(challenges.map(c => 
+        c.id === challengeId ? updatedChallenge : c
+      ));
+    }
+  };
+
   const filteredChallenges = challenges.filter((challenge) => {
     if (filter === "all") return true;
     if (filter === "active") return challenge.is_active === "1";
@@ -46,7 +58,7 @@ export default function Challenges() {
                 <Trophy className="me-2" size={32} />
                 Mission Control
               </h1>
-              <Link to="/createChallenge" className="btn btn-primary">
+              <Link to="/challenges/create" className="btn btn-primary">
                 <Plus size={20} className="me-2" />
                 Create Challenge
               </Link>
@@ -96,7 +108,11 @@ export default function Challenges() {
                   </div>
                 ) : (
                   filteredChallenges.map((challenge) => (
-                    <ChallengeCard key={challenge.id} challenge={challenge} />
+                    <ChallengeCard 
+                      key={challenge.id} 
+                      challenge={challenge} 
+                      onChallengeUpdate={handleChallengeUpdate}
+                    />
                   ))
                 )}
               </div>

@@ -51,23 +51,20 @@ module.exports = {
       points_rewarded,
       credits_rewarded,
       duration_days,
+      difficulty_id,
+      is_active,
     } = req.body; // destructure body
     const creator_id = req.userId;
+    
     if (
       !title ||
       points_rewarded === undefined ||
-      credits_rewarded === undefined
+      credits_rewarded === undefined ||
+      !difficulty_id
     ) {
       return next(new AppError("missing required input", 404));
     }
-    const totalValue = points_rewarded + credits_rewarded; // total points and credits
-    let difficultyId = 1; // default difficulty
-    if (totalValue > 100) {
-      // based off total points and credits, difficulty ids are assigned
-      difficultyId = 3;
-    } else if (totalValue > 50) {
-      difficultyId = 2;
-    }
+
     const data = {
       // data with required fields and defaults
       title,
@@ -75,11 +72,12 @@ module.exports = {
       points_rewarded: points_rewarded || 0,
       credits_rewarded: credits_rewarded || 0,
       creator_id,
-      difficulty_id: difficultyId,
+      difficulty_id: difficulty_id, // Use the difficulty_id from frontend
       duration_days: duration_days || 1,
-      is_active: "1",
+      is_active: is_active || "1",
     };
-    challengeModels.createChallenge(difficultyId, data, (err, results) => {
+    
+    challengeModels.createChallenge(difficulty_id, data, (err, results) => {
       // create challenge
       if (err) {
         return next(new AppError("Internal Server Error", 503));
@@ -101,21 +99,14 @@ module.exports = {
       points_rewarded,
       credits_rewarded,
       duration_days,
+      difficulty_id,
       is_active,
     } = req.body; // destructure body
 
-    if (!is_active || !title) {
+    if (!is_active || !title || !difficulty_id) {
       return next(new AppError("Missing Required Data", 404)); // check for missing required input
     }
 
-    const totalValue = points_rewarded + credits_rewarded; // total points and credits
-    let difficultyId = 1; // default difficulty
-    if (totalValue > 100) {
-      // based off total points and credits, difficulty ids are assigned
-      difficultyId = 3;
-    } else if (totalValue > 50) {
-      difficultyId = 2;
-    }
     const data = {
       // data with required fields and defaults
       title,
@@ -123,12 +114,13 @@ module.exports = {
       points_rewarded: points_rewarded || 0,
       credits_rewarded: credits_rewarded || 0,
       duration_days: duration_days || 1,
+      difficulty_id: difficulty_id, // Use the difficulty_id from frontend
       is_active: is_active.toString() || "1", // convert to string as is_active is enum
     };
 
     challengeModels.updateChallenge(
       // update challenge
-      difficultyId,
+      difficulty_id, // Use the difficulty_id from frontend
       userId,
       challengeId,
       data,

@@ -1,14 +1,60 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { MoreVertical, Edit3, Trash2, Eye, EyeOff } from "lucide-react";
 import api from "../../services/api";
 import Toast from "../Toast/Toast";
+import { useAuth } from "../../hooks/useAuth";
 
-export default function ChallengeCard({ challenge }) {
+export default function ChallengeCard({ challenge, onChallengeUpdate }) {
+  const { user } = useAuth();
   const [isStarting, setIsStarting] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  // Fix: user is an array, so we need to access user[0]
+  const currentUser = Array.isArray(user) ? user[0] : user;
+  const isOwner = currentUser && challenge.creator_id && challenge.creator_id === currentUser.id;
 
   const showToast = (message, type = 'success') => {
     setToast({ show: true, message, type });
+  };
+
+  const handleToggleActive = async () => {
+    try {
+      const newStatus = challenge.is_active === "1" ? "0" : "1";
+      await api.put(`/challenges/update/${challenge.id}`, {
+        ...challenge,
+        is_active: newStatus
+      });
+      
+      if (onChallengeUpdate) {
+        onChallengeUpdate(challenge.id, { ...challenge, is_active: newStatus });
+      }
+      
+      showToast(
+        `Challenge ${newStatus === "1" ? "activated" : "deactivated"} successfully`, 
+        'success'
+      );
+    } catch (err) {
+      console.error('Error toggling challenge status:', err);
+      showToast('Failed to update challenge status', 'error');
+    }
+  };
+
+  const handleDeleteChallenge = async () => {
+    try {
+      await api.delete(`/challenges/delete/${challenge.id}`);
+      
+      if (onChallengeUpdate) {
+        onChallengeUpdate(challenge.id, null); // null indicates deletion
+      }
+      
+      setShowDeleteModal(false);
+      showToast('Challenge deleted successfully', 'success');
+    } catch (err) {
+      console.error('Error deleting challenge:', err);
+      showToast('Failed to delete challenge', 'error');
+    }
   };
 
   const handleStartChallenge = async () => {
@@ -41,7 +87,50 @@ export default function ChallengeCard({ challenge }) {
       >
         {String(challenge.is_active) === "1" ? (
           <>
-            <h3 className="text-white">{challenge.title}</h3>
+            <div className="d-flex justify-content-between align-items-start mb-2">
+              <h3 className="text-white mb-0">{challenge.title}</h3>
+              {isOwner && (
+                <div className="dropdown">
+                  <button 
+                    className="btn btn-sm btn-outline-secondary"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    <MoreVertical size={16} />
+                  </button>
+                  <ul className="dropdown-menu dropdown-menu-dark">
+                    <li>
+                      <Link 
+                        className="dropdown-item"
+                        to="/challenges/profile"
+                      >
+                        <Edit3 size={16} className="me-2" />
+                        Edit
+                      </Link>
+                    </li>
+                    <li>
+                      <button 
+                        className="dropdown-item"
+                        onClick={handleToggleActive}
+                      >
+                        <EyeOff size={16} className="me-2" />
+                        Deactivate
+                      </button>
+                    </li>
+                    <li><hr className="dropdown-divider" /></li>
+                    <li>
+                      <button 
+                        className="dropdown-item text-danger"
+                        onClick={() => setShowDeleteModal(true)}
+                      >
+                        <Trash2 size={16} className="me-2" />
+                        Delete
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>
             <p className="text-muted">{challenge.description}</p>
             <div className="row mb-3">
               <div className="col-md-6">
@@ -75,9 +164,95 @@ export default function ChallengeCard({ challenge }) {
           </>
         ) : (
           <>
-            <h3 className="alert alert-danger">{challenge.title} - Inactive</h3>
+            <div className="d-flex justify-content-between align-items-start mb-2">
+              <h3 className="alert alert-danger mb-0">{challenge.title} - Inactive</h3>
+              {isOwner && (
+                <div className="dropdown">
+                  <button 
+                    className="btn btn-sm btn-outline-secondary"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    <MoreVertical size={16} />
+                  </button>
+                  <ul className="dropdown-menu dropdown-menu-dark">
+                    <li>
+                      <Link 
+                        className="dropdown-item"
+                        to="/challenges/profile"
+                      >
+                        <Edit3 size={16} className="me-2" />
+                        Edit
+                      </Link>
+                    </li>
+                    <li>
+                      <button 
+                        className="dropdown-item"
+                        onClick={handleToggleActive}
+                      >
+                        <Eye size={16} className="me-2" />
+                        Activate
+                      </button>
+                    </li>
+                    <li><hr className="dropdown-divider" /></li>
+                    <li>
+                      <button 
+                        className="dropdown-item text-danger"
+                        onClick={() => setShowDeleteModal(true)}
+                      >
+                        <Trash2 size={16} className="me-2" />
+                        Delete
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>
             <p className="text-muted">This challenge is currently inactive.</p>
           </>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && (
+          <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+            <div className="modal-dialog">
+              <div className="modal-content bg-dark text-white">
+                <div className="modal-header border-secondary">
+                  <h5 className="modal-title text-danger">
+                    <Trash2 size={20} className="me-2" />
+                    Delete Challenge
+                  </h5>
+                  <button 
+                    type="button" 
+                    className="btn-close btn-close-white" 
+                    onClick={() => setShowDeleteModal(false)}
+                  ></button>
+                </div>
+                <div className="modal-body">
+                  <p>Are you sure you want to delete <strong>"{challenge.title}"</strong>?</p>
+                  <p className="text-warning small">
+                    <strong>Warning:</strong> This action cannot be undone.
+                  </p>
+                </div>
+                <div className="modal-footer border-secondary">
+                  <button 
+                    type="button" 
+                    className="btn btn-secondary" 
+                    onClick={() => setShowDeleteModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="button" 
+                    className="btn btn-danger" 
+                    onClick={handleDeleteChallenge}
+                  >
+                    Delete Challenge
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </>

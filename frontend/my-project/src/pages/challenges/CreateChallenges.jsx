@@ -27,9 +27,9 @@ export default function CreateChallenges() {
         setDifficulties(response.data.results);
         // Set default difficulty_id to first difficulty
         if (response.data.results.length > 0) {
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
-            difficulty_id: response.data.results[0].id
+            difficulty_id: response.data.results[0].id,
           }));
         }
       } catch (error) {
@@ -43,20 +43,26 @@ export default function CreateChallenges() {
   }, []);
 
   const getCurrentDifficulty = () => {
-    return difficulties.find(d => d.id == formData.difficulty_id) || { name: "Unknown", min_value: 0 };
+    return (
+      difficulties.find((d) => d.id == formData.difficulty_id) || {
+        name: "Unknown",
+        min_value: 0,
+      }
+    );
   };
 
   const validateRewards = () => {
-    const totalRewards = parseInt(formData.points_rewarded) + parseInt(formData.credits_rewarded);
+    const totalRewards =
+      parseInt(formData.points_rewarded) + parseInt(formData.credits_rewarded);
     const selectedDifficulty = getCurrentDifficulty();
-    
+
     if (totalRewards < selectedDifficulty.min_value) {
       setValidationError(
-        `${selectedDifficulty.name} difficulty requires a minimum total of ${selectedDifficulty.min_value} points + credits. Current total: ${totalRewards}`
+        `${selectedDifficulty.name} difficulty requires a minimum total of ${selectedDifficulty.min_value} points + credits. Current total: ${totalRewards}`,
       );
       return false;
     }
-    
+
     setValidationError("");
     return true;
   };
@@ -66,7 +72,7 @@ export default function CreateChallenges() {
       ...formData,
       [e.target.name]: e.target.value,
     });
-    
+
     // Clear validation error when user makes changes
     if (validationError) {
       setValidationError("");
@@ -75,14 +81,17 @@ export default function CreateChallenges() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate rewards before submitting
     if (!validateRewards()) {
       return;
     }
-    
+
+    console.log("Submitting challenge data:", formData);
+
     try {
-      await api.post("/challenges", formData);
+      const response = await api.post("/challenges/create", formData);
+      console.log("Challenge created successfully:", response.data);
       setShowPopUp(true);
       // Reset form
       setFormData({
@@ -95,7 +104,9 @@ export default function CreateChallenges() {
         is_active: "1",
       });
     } catch (err) {
-      console.error(err);
+      console.error("Error creating challenge:", err);
+      console.error("Error response:", err.response?.data);
+      setValidationError(err.response?.data?.message || "Failed to create challenge. Please try again.");
     }
   };
 
@@ -112,7 +123,10 @@ export default function CreateChallenges() {
       <div className="container mt-5 text-white">
         {/* Validation Error */}
         {validationError && (
-          <div className="alert alert-danger d-flex align-items-center mb-4" role="alert">
+          <div
+            className="alert alert-danger d-flex align-items-center mb-4"
+            role="alert"
+          >
             <Target size={20} className="me-2" />
             {validationError}
           </div>
@@ -120,7 +134,10 @@ export default function CreateChallenges() {
 
         {/* Success Popup */}
         {showPopUp && (
-          <div className="alert alert-success d-flex align-items-center" role="alert">
+          <div
+            className="alert alert-success d-flex align-items-center"
+            role="alert"
+          >
             <CheckCircle size={20} className="me-2" />
             Challenge created successfully!
           </div>
@@ -134,12 +151,13 @@ export default function CreateChallenges() {
           >
             <ArrowLeft size={20} />
           </button>
-          <h1 className="h2 mb-0">
-            Construct New Challenge
-          </h1>
+          <h1 className="h2 mb-0">Construct New Challenge</h1>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-dark p-4 rounded border border-secondary">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-dark p-4 rounded border border-secondary"
+        >
           <div className="row">
             {/* Left Column: Basic Info */}
             <div className="col-md-8">
@@ -202,13 +220,16 @@ export default function CreateChallenges() {
                     min="0"
                   />
                 </div>
-                
+
                 {/* Real-time total display */}
                 <div className="mt-2 p-2 bg-secondary rounded">
                   <small className="text-light">
-                    Total: {parseInt(formData.points_rewarded || 0) + parseInt(formData.credits_rewarded || 0)} 
+                    Total:{" "}
+                    {parseInt(formData.points_rewarded || 0) +
+                      parseInt(formData.credits_rewarded || 0)}
                     <span className="text-muted ms-2">
-                      (Min for {getCurrentDifficulty().name}: {getCurrentDifficulty().min_value})
+                      (Min for {getCurrentDifficulty().name}:{" "}
+                      {getCurrentDifficulty().min_value})
                     </span>
                   </small>
                 </div>
@@ -228,7 +249,7 @@ export default function CreateChallenges() {
                   {loading ? (
                     <option>Loading difficulties...</option>
                   ) : (
-                    difficulties.map(difficulty => (
+                    difficulties.map((difficulty) => (
                       <option key={difficulty.id} value={difficulty.id}>
                         {difficulty.name} (Min: {difficulty.min_value} total)
                       </option>

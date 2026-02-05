@@ -19,6 +19,9 @@ function Navbar() {
         <Link className="nav-link text-white" to="/challenges">
           Challenges
         </Link>
+        <Link className="nav-link text-white" to="/challenges/profile">
+          My Challenges
+        </Link>
         <Link className="nav-link text-white" to="/leaderboard">
           Leaderboard
         </Link>

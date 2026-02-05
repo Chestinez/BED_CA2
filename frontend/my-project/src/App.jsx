@@ -11,6 +11,7 @@ import LeaderBoard from "./pages/leaderboard/LeaderBoard";
 import Profile from "./pages/Inventory/Profile";
 import CreateChallenges from "./pages/challenges/CreateChallenges";
 import ChallengeDetails from "./pages/challenges/ChallengeDetails";
+import ChallengeProfile from "./pages/challenges/ChallengeProfile";
 import Inventory from "./pages/Inventory/Inventory";
 
 export default function App() {
@@ -24,6 +25,8 @@ export default function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/challenges" element={<Challenges />} />
+          <Route path="/challenges/create" element={<CreateChallenges />} />
+          <Route path="/challenges/profile" element={<ChallengeProfile />} />
           <Route path="/challenges/:id" element={<ChallengeDetails />} />
           <Route path="/createChallenge" element={<CreateChallenges />} />
           <Route path="/leaderboard" element={<LeaderBoard />} />
