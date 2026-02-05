@@ -5,7 +5,7 @@ import { useAuth } from "../../hooks/useAuth";
 export default function Register() {
   const { register, showPopUp } = useAuth();
   const [form, setForm] = useState({
-    name: "",
+    username: "",
     email: "",
     password: "",
     description: "",
@@ -20,14 +20,14 @@ export default function Register() {
     e.preventDefault();
     setErrMsg("");
 
-    if (form.name.length < 5)
+    if (form.username.length < 5)
       return setErrMsg("Username must be at least 5 characters");
 
     if (form.password.length < 8)
       return setErrMsg("Password must be at least 8 characters");
 
     try {
-      await register(form.name, form.email, form.password, form.description);
+      await register(form.username, form.email, form.password, form.description);
       showPopUp("Crew profile created. Welcome aboard.", "success");
       window.location.href = "/dashboard";
     } catch (err) {
@@ -36,7 +36,7 @@ export default function Register() {
   };
 
   return (
-    <div className="container vh-100 d-flex justify-content-center align-items-center">
+    <div className="container min-vh-100 d-flex justify-content-center align-items-center py-4">
       <div className="card p-4 futuristic-card" style={{ width: "450px" }}>
 
         {errMsg && <div className="alert alert-danger">{errMsg}</div>}
@@ -49,8 +49,8 @@ export default function Register() {
           <div className="mb-3">
             <label>Username</label>
             <input
-              name="name"
-              value={form.name}
+              name="username"
+              value={form.username}
               onChange={handleChange}
               className="form-control futuristic-input"
               placeholder="Choose Pilot ID"

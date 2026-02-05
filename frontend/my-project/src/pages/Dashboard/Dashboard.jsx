@@ -1,4 +1,4 @@
-import { useRef} from "react";
+import { useRef } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -10,24 +10,27 @@ export default function Dashboard() {
   const { user, logout } = useAuth();
   const dashRef = useRef();
 
-  const userProfile = user ? JSON.parse(localStorage.getItem("userData"))[0] : null;
+  const userProfile = user
+    ? JSON.parse(localStorage.getItem("userData"))[0]
+    : null;
 
   // Calculate rank progression
   const getRankProgression = () => {
-    if (!userProfile) return { percentage: 0, pointsNeeded: 0, isMaxRank: false };
-    
+    if (!userProfile)
+      return { percentage: 0, pointsNeeded: 0, isMaxRank: false };
+
     const nextRankPoints = userProfile.next_rank_points;
     const nextRankPercentage = userProfile.next_rank_percentage;
-    
+
     // If no next rank data, user is at max rank
     if (nextRankPoints === null || nextRankPoints === undefined) {
       return { percentage: 100, pointsNeeded: 0, isMaxRank: true };
     }
-    
+
     return {
       percentage: nextRankPercentage,
       pointsNeeded: nextRankPoints,
-      isMaxRank: false
+      isMaxRank: false,
     };
   };
 
@@ -36,61 +39,73 @@ export default function Dashboard() {
   useGSAP(
     () => {
       if (!userProfile) return;
-      
+
       // Set initial state
-      gsap.set([".welcome-banner", ".stat-box", ".ship-section"], { 
-        opacity: 0, 
-        y: 30 
+      gsap.set([".welcome-banner", ".stat-box", ".ship-section"], {
+        opacity: 0,
+        y: 30,
       });
       gsap.set(".rank-progress", { scaleX: 0 });
-      
+
       // We use a Timeline so things happen in a perfect sequence
       const tl = gsap.timeline();
 
       // Animate elements that actually exist
-      tl.to(".welcome-banner", { 
-        y: 0, 
-        opacity: 1, 
+      tl.to(".welcome-banner", {
+        y: 0,
+        opacity: 1,
         duration: 0.8,
         ease: "power2.out",
       })
-      .to(".stat-box", {
-        y: 0,
-        opacity: 1,
-        stagger: 0.15,
-        duration: 0.6,
-        ease: "back.out(1.7)",
-      }, "-=0.4")
-      .to(".rank-progress", {
-        scaleX: 1,
-        duration: 1,
-        ease: "power2.out",
-      }, "-=0.2")
-      .to(".ship-section", {
-        y: 0,
-        opacity: 1,
-        duration: 0.6,
-        ease: "power2.out",
-      }, "-=0.3");
+        .to(
+          ".stat-box",
+          {
+            y: 0,
+            opacity: 1,
+            stagger: 0.15,
+            duration: 0.6,
+            ease: "back.out(1.7)",
+          },
+          "-=0.4",
+        )
+        .to(
+          ".rank-progress",
+          {
+            scaleX: 1,
+            duration: 1,
+            ease: "power2.out",
+          },
+          "-=0.2",
+        )
+        .to(
+          ".ship-section",
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.6,
+            ease: "power2.out",
+          },
+          "-=0.3",
+        );
     },
     { scope: dashRef, dependencies: [userProfile] },
   );
 
   if (!user) {
     return (
-      <div className="position-relative vh-100 bg-dark overflow-hidden">
+      <div className="position-relative min-vh-100 bg-dark">
         <div className="loader-wrapper position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark">
-          <div className="loader-orb bg-primary rounded-circle" style={{ width: 50, height: 50 }}></div>
+          <div
+            className="loader-orb bg-primary rounded-circle"
+            style={{ width: 50, height: 50 }}
+          ></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div
-      ref={dashRef}
-      className="d-flex vh-100 bg-dark text-white overflow-hidden"
-    >
+    <div ref={dashRef} className="d-flex min-vh-100 bg-dark text-white">
       {/* SIDEBAR / NAVBAR */}
       <Navbar />
 
@@ -124,10 +139,9 @@ export default function Dashboard() {
                 <div className="d-flex justify-content-between align-items-center mb-2">
                   <span className="text-white-50 small">Rank Progress</span>
                   <span className="text-white-50 small">
-                    {rankProgression.isMaxRank 
-                      ? "Max Rank Achieved!" 
-                      : `${rankProgression.pointsNeeded} points needed`
-                    }
+                    {rankProgression.isMaxRank
+                      ? "Max Rank Achieved!"
+                      : `${rankProgression.pointsNeeded} points needed`}
                   </span>
                 </div>
                 <div
@@ -136,17 +150,16 @@ export default function Dashboard() {
                 >
                   <div
                     className="progress-bar bg-info shadow-glow rank-progress"
-                    style={{ 
+                    style={{
                       width: `${rankProgression.percentage}%`,
-                      transformOrigin: "left center"
+                      transformOrigin: "left center",
                     }}
                   ></div>
                 </div>
                 <small className="text-white-50 mt-2 d-block">
-                  {rankProgression.isMaxRank 
-                    ? "You've reached the highest rank!" 
-                    : `${Math.round(rankProgression.percentage)}% to next rank`
-                  }
+                  {rankProgression.isMaxRank
+                    ? "You've reached the highest rank!"
+                    : `${Math.round(rankProgression.percentage)}% to next rank`}
                 </small>
               </div>
             </div>
@@ -176,11 +189,18 @@ export default function Dashboard() {
               <p className="text-muted text-uppercase small ls-1">Missions</p>
               <h2 className="fw-bold">
                 {userProfile.missions_completed || 0}{" "}
-                <span className="fs-5 opacity-50">
-                   {userProfile.missions_total || 0}
-                </span>
+                <small className="text-muted">Completed</small>
+                {userProfile.missions_total > 0 && (
+                  <>
+                    <br />
+                    {userProfile.missions_total}{' '}
+                    <small className="text-muted">
+                      of total missions
+                    </small>
+                  </>
+                )}
               </h2>
-              <small className="text-success">Completed</small>
+
               {userProfile.missions_pending > 0 && (
                 <div className="mt-1">
                   <small className="text-warning">
@@ -198,9 +218,7 @@ export default function Dashboard() {
               <h2 className="fw-bold text-success">
                 ${userProfile.credits || 0}
               </h2>
-              <small className="text-muted">
-                For ship upgrades
-              </small>
+              <small className="text-muted">For ship upgrades</small>
             </div>
           </div>
         </div>

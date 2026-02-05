@@ -6,16 +6,122 @@
 
 :root {
   --bg-dark: rgb(18, 20, 24);
-  --card-bg: rgba(255, 255, 255, 0.05); /* The "Glass" effect */
+  --card-bg: rgba(255, 255, 255, 0.05);
   --neon-blue: rgb(39, 212, 251);
   --neon-purple: rgb(184, 100, 216);
+  --text-primary: rgb(230, 244, 249);
+  --text-light-gray: rgb(203, 213, 225);
+  --text-medium-gray: rgb(156, 163, 175);
+  --text-dark-gray: rgb(107, 114, 128);
+}
+
+/* Force dark theme globally */
+html {
+  color-scheme: dark !important;
 }
 
 body {
-  background-color: var(--bg-dark);
-  color: rgb(230, 244, 249);
+  background-color: var(--bg-dark) !important;
+  color: var(--text-primary) !important;
   font-family: "Inter", sans-serif;
   overflow-y: auto;
+}
+
+/* Override system light mode preference */
+@media (prefers-color-scheme: light) {
+  :root {
+    color: var(--text-primary) !important;
+    background-color: var(--bg-dark) !important;
+  }
+  
+  body {
+    color: var(--text-primary) !important;
+    background-color: var(--bg-dark) !important;
+  }
+}
+
+/* Simple Bootstrap overrides for dark theme */
+.form-control {
+  background-color: var(--bg-dark) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: var(--text-primary) !important;
+}
+
+.form-control:focus {
+  background-color: var(--bg-dark) !important;
+  border-color: var(--neon-blue) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 0 0 0.2rem rgba(39, 212, 251, 0.25) !important;
+}
+
+.card {
+  background-color: var(--bg-dark) !important;
+  color: var(--text-primary) !important;
+}
+
+.table {
+  color: var(--text-primary) !important;
+}
+
+.modal-content {
+  background-color: var(--bg-dark) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Fix warning badges to have dark text */
+.badge.bg-warning {
+  color: var(--bg-dark) !important;
+}
+
+/* Better gray text colors for dark theme */
+.text-muted {
+  color: var(--text-light-gray) !important;
+}
+
+.text-secondary {
+  color: var(--text-medium-gray) !important;
+}
+
+/* Override any inline gray styles that are too dark */
+[style*="color: gray"], 
+[style*="color: grey"], 
+[style*="color: #666"], 
+[style*="color: #777"], 
+[style*="color: #888"], 
+[style*="color: #999"] {
+  color: var(--text-light-gray) !important;
+}
+
+/* Bootstrap gray utility classes - make them lighter */
+.text-dark {
+  color: var(--text-light-gray) !important;
+}
+
+.text-black-50 {
+  color: var(--text-medium-gray) !important;
+}
+
+/* Small text elements - make them more visible */
+small, .small {
+  color: var(--text-light-gray) !important;
+}
+
+/* Placeholder text - lighter gray */
+::placeholder {
+  color: var(--text-medium-gray) !important;
+  opacity: 1;
+}
+
+::-webkit-input-placeholder {
+  color: var(--text-medium-gray) !important;
+}
+
+::-moz-placeholder {
+  color: var(--text-medium-gray) !important;
+}
+
+:-ms-input-placeholder {
+  color: var(--text-medium-gray) !important;
 }
 
 /* App container */
@@ -36,12 +142,12 @@ body {
 /* Glass card styling */
 .glass-card {
   background: var(--card-bg);
-  backdrop-filter: blur(10px); /* This creates the frost effect */
+  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 15px;
 }
 
-/* Layout utilities - ensure they work properly */
+/* Layout utilities */
 .vh-100 {
   height: 100vh !important;
 }
@@ -90,6 +196,11 @@ body {
   background: var(--bg-dark);
 }
 
+.loader-wrapper {
+  z-index: 9999;
+  pointer-events: none;
+}
+
 .loader-orb {
   width: 60px;
   height: 60px;
@@ -132,4 +243,27 @@ body {
   opacity: 0;
   filter: blur(5px);
   visibility: hidden;
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+/* Challenge completion modal styling */
+.modal-content {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+.modal-content .form-control:focus {
+  border-color: var(--neon-blue) !important;
+  box-shadow: 0 0 0 0.2rem rgba(39, 212, 251, 0.25) !important;
+}
+
+.modal-content .border-warning:focus {
+  border-color: #ffc107 !important;
+  box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25) !important;
+}
+
+/* Fix select options */
+option {
+  color: var(--text-primary) !important;
+  background-color: var(--bg-dark) !important;
 }

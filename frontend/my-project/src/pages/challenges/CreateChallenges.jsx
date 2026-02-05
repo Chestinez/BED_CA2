@@ -6,6 +6,9 @@ import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
 
 export default function CreateChallenges() {
   const [showPopUp, setShowPopUp] = useState(false);
+  const [validationError, setValidationError] = useState("");
+  const [difficulties, setDifficulties] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -16,15 +19,68 @@ export default function CreateChallenges() {
     is_active: "1",
   });
 
+  // Fetch difficulties from API
+  useEffect(() => {
+    const fetchDifficulties = async () => {
+      try {
+        const response = await api.get("/difficulties");
+        setDifficulties(response.data.results);
+        // Set default difficulty_id to first difficulty
+        if (response.data.results.length > 0) {
+          setFormData(prev => ({
+            ...prev,
+            difficulty_id: response.data.results[0].id
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching difficulties:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDifficulties();
+  }, []);
+
+  const getCurrentDifficulty = () => {
+    return difficulties.find(d => d.id == formData.difficulty_id) || { name: "Unknown", min_value: 0 };
+  };
+
+  const validateRewards = () => {
+    const totalRewards = parseInt(formData.points_rewarded) + parseInt(formData.credits_rewarded);
+    const selectedDifficulty = getCurrentDifficulty();
+    
+    if (totalRewards < selectedDifficulty.min_value) {
+      setValidationError(
+        `${selectedDifficulty.name} difficulty requires a minimum total of ${selectedDifficulty.min_value} points + credits. Current total: ${totalRewards}`
+      );
+      return false;
+    }
+    
+    setValidationError("");
+    return true;
+  };
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+    
+    // Clear validation error when user makes changes
+    if (validationError) {
+      setValidationError("");
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate rewards before submitting
+    if (!validateRewards()) {
+      return;
+    }
+    
     try {
       await api.post("/challenges", formData);
       setShowPopUp(true);
@@ -35,7 +91,7 @@ export default function CreateChallenges() {
         points_rewarded: 0,
         credits_rewarded: 0,
         duration_days: 1,
-        difficulty_id: 1,
+        difficulty_id: difficulties.length > 0 ? difficulties[0].id : 1,
         is_active: "1",
       });
     } catch (err) {
@@ -54,6 +110,14 @@ export default function CreateChallenges() {
   return (
     <PageLoadWrap>
       <div className="container mt-5 text-white">
+        {/* Validation Error */}
+        {validationError && (
+          <div className="alert alert-danger d-flex align-items-center mb-4" role="alert">
+            <Target size={20} className="me-2" />
+            {validationError}
+          </div>
+        )}
+
         {/* Success Popup */}
         {showPopUp && (
           <div className="alert alert-success d-flex align-items-center" role="alert">
@@ -138,6 +202,16 @@ export default function CreateChallenges() {
                     min="0"
                   />
                 </div>
+                
+                {/* Real-time total display */}
+                <div className="mt-2 p-2 bg-secondary rounded">
+                  <small className="text-light">
+                    Total: {parseInt(formData.points_rewarded || 0) + parseInt(formData.credits_rewarded || 0)} 
+                    <span className="text-muted ms-2">
+                      (Min for {getCurrentDifficulty().name}: {getCurrentDifficulty().min_value})
+                    </span>
+                  </small>
+                </div>
               </div>
 
               <div className="mb-3">
@@ -149,10 +223,17 @@ export default function CreateChallenges() {
                   value={formData.difficulty_id}
                   onChange={handleChange}
                   className="form-select bg-dark text-white border-secondary"
+                  disabled={loading}
                 >
-                  <option value="1">Easy (Rank 1)</option>
-                  <option value="2">Medium (Rank 2)</option>
-                  <option value="3">Hard (Rank 3)</option>
+                  {loading ? (
+                    <option>Loading difficulties...</option>
+                  ) : (
+                    difficulties.map(difficulty => (
+                      <option key={difficulty.id} value={difficulty.id}>
+                        {difficulty.name} (Min: {difficulty.min_value} total)
+                      </option>
+                    ))
+                  )}
                 </select>
               </div>
 

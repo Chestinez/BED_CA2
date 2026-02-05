@@ -51,14 +51,14 @@ function PageLoadWrap({ children }) {
   return (
     <div
       ref={containerRef}
-      className="position-relative vh-100 bg-dark overflow-hidden"
+      className="position-relative min-vh-100 bg-dark"
     >
       {!isAnimationDone && (
         <div className="loader-wrapper position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark">
           <div className="loader-orb bg-primary rounded-circle" style={{ width: 50, height: 50 }}></div>
         </div>
       )}
-      <div className="page-content h-100">{children}</div>
+      <div className="page-content">{children}</div>
     </div>
   );
 }

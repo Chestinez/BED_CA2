@@ -6,11 +6,13 @@ const users = require("./usersRoutes");
 const challenges = require("./challengesRoutes");
 const completions = require("./completionsRoutes");
 const resources = require("./resourceRoutes");
+const difficulties = require("./difficultyRoutes");
 
 // main routes
 router.use("/users", users);
 router.use("/challenges", challenges);
 router.use("/completions", completions);
 router.use("/resources", resources);
+router.use("/difficulties", difficulties);
 
 module.exports = router;

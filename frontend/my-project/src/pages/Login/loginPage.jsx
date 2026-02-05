@@ -5,7 +5,7 @@ import { useAuth } from "../../hooks/useAuth";
 export default function Login() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [errMsg, setErrMsg] = useState("");
-  const { login, showPopUp } = useAuth();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -21,7 +21,6 @@ export default function Login() {
 
     try {
       await login(form.name, form.email, form.password);
-      showPopUp("Access Granted. Welcome aboard.", "success");
       window.location.href = "/dashboard";
     } catch (err) {
       setErrMsg(err.response?.data?.message || "Login Failed");
@@ -29,7 +28,7 @@ export default function Login() {
   };
 
   return (
-    <div className="container vh-100 d-flex justify-content-center align-items-center">
+    <div className="container min-vh-100 d-flex justify-content-center align-items-center py-4">
       <div className="card p-4 futuristic-card" style={{ width: "420px" }}>
         {errMsg && <div className="alert alert-danger">{errMsg}</div>}
 

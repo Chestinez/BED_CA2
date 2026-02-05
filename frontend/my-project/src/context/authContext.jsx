@@ -6,6 +6,14 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState(null);
+  const [popUp, setPopUp] = useState({ show: false, message: "", type: "" });
+
+  const showPopUp = (message, type = "info") => {
+    setPopUp({ show: true, message, type });
+    setTimeout(() => {
+      setPopUp({ show: false, message: "", type: "" });
+    }, 3000);
+  };
 
   useEffect(() => {
     const currentPath = window.location.pathname;
@@ -104,14 +112,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const showPopUp = (message, type) => {
-    if (type == "success") {
-      setNotifications({ message, type });
-    }
-    setTimeout(() => {
-      setNotifications(null);
-    }, 3000);
-  };
   const value = {
     user,
     setUser,
@@ -121,12 +121,31 @@ export const AuthProvider = ({ children }) => {
     setLoading,
     login,
     logout,
-    showPopUp,
     notifications,
     setNotifications,
     register,
     verifyUser, // Expose verifyUser for manual calls
+    showPopUp,
+    popUp,
   };
 
-  return <authContext.Provider value={value}>{children}</authContext.Provider>;
+  return (
+    <authContext.Provider value={value}>
+      {children}
+      {/* Global Popup */}
+      {popUp.show && (
+        <div 
+          className={`alert alert-${popUp.type === 'success' ? 'success' : 'danger'} position-fixed`}
+          style={{ 
+            top: '20px', 
+            right: '20px', 
+            zIndex: 9999,
+            minWidth: '300px'
+          }}
+        >
+          {popUp.message}
+        </div>
+      )}
+    </authContext.Provider>
+  );
 };

@@ -14,7 +14,7 @@ export default function ChallengeCard({ challenge }) {
   const handleStartChallenge = async () => {
     try {
       setIsStarting(true);
-      const response = await api.post(`/challenges/${challenge.id}/start`, {
+      await api.post(`/challenges/${challenge.id}/start`, {
         notes: `Started challenge: ${challenge.title}`
       });
       
@@ -55,7 +55,7 @@ export default function ChallengeCard({ challenge }) {
             </div>
             <div className="mb-3">
               <span
-                className={`badge me-2 ${challenge.difficultyName === "Easy" ? "bg-success" : challenge.difficultyName === "Medium" ? "bg-warning text-dark" : "bg-danger"}`}
+                className={`badge me-2 ${challenge.difficultyName === "Easy" ? "bg-success" : challenge.difficultyName === "Medium" ? "bg-warning text-black" : "bg-danger"}`}
               >
                 Difficulty: {challenge.difficultyName}
               </span>
