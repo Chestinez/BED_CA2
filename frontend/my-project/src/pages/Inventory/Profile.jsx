@@ -363,12 +363,26 @@ export default function Profile() {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+      </div>
 
-            <div className="mt-4">
-              <h3 className="text-white mb-3">Ship Assembly</h3>
+      {/* Ship Assembly - Full Width Section */}
+      {profileData && (
+        <div className="container-fluid mt-4 px-4">
+          <h3 className="text-white mb-3 text-center">Ship Assembly</h3>
+          <div className="d-flex justify-content-center">
+            <div style={{ width: '100%', maxWidth: '1000px' }}>
               <ShipAssembly profileData={profileData} />
             </div>
+          </div>
+        </div>
+      )}
 
+      {/* Back to container for other content */}
+      <div className="container mt-4">
+        {profileData && (
+          <div className="text-white">
             {/* Pending Challenges - Only for own profile */}
             {isOwnProfile && (
               <div className="mt-4">
