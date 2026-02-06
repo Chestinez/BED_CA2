@@ -1,22 +1,24 @@
+// Authentication Context Provider
+// Manages user authentication state and provides auth functions to the app
 import { useState, useEffect } from "react";
 import api, { authApi } from "../services/api";
 import { authContext } from "./authContextCreator";
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [notifications, setNotifications] = useState(null);
 
+export const AuthProvider = ({ children }) => {
+  // State management
+  const [user, setUser] = useState(null); // Current user data
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Auth status
+  const [loading, setLoading] = useState(true); // Loading state
+  const [notifications, setNotifications] = useState(null); // Notifications
+
+  // Initialize authentication on app load
   useEffect(() => {
     const currentPath = window.location.pathname;
     
-    // Initialize auth - used to check if user is authenticated, by pushing user to a route with auth middleware
-    // Always try to verify user, but use authApi to avoid redirect loops
-    // and only redirect to login if not already on login or register pages
     const initializeAuth = async () => {
       try {
+        // Verify user is authenticated
         const res = await authApi.get("/users/profile/me");
-        // Fix: Extract user data from array format [userData]
         const userData = Array.isArray(res.data.results)
           ? res.data.results[0]
           : res.data.results;

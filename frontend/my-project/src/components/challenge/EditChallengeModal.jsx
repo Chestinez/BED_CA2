@@ -1,3 +1,5 @@
+// Edit Challenge Modal - Modal for editing existing challenges
+// Validates rewards and difficulty, can set challenge to inactive if validation fails
 import { useState, useEffect } from "react";
 import { Edit3 } from "lucide-react";
 

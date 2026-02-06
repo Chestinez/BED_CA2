@@ -5,6 +5,11 @@ import api from "../../services/api";
 import Toast from "../Toast/Toast";
 import { useAuth } from "../../hooks/useAuth";
 
+// ChallengeCard
+// A card component for displaying challenge information and actions.
+// It includes buttons for editing, deleting, and toggling challenge status.
+// with toasts for success and error messages
+
 export default function ChallengeCard({ challenge, onChallengeUpdate }) {
   const { user } = useAuth();
   const [isStarting, setIsStarting] = useState(false);
@@ -19,7 +24,8 @@ export default function ChallengeCard({ challenge, onChallengeUpdate }) {
   const showToast = (message, type = 'success') => {
     setToast({ show: true, message, type });
   };
-
+  
+  // function to toggle challenge status
   const handleToggleActive = async () => {
     try {
       const new_is_active = challenge.is_active === "1" ? "0" : "1";
@@ -41,7 +47,8 @@ export default function ChallengeCard({ challenge, onChallengeUpdate }) {
       showToast('Failed to update challenge status', 'error');
     }
   };
-
+  
+  // function to delete challenge
   const handleDeleteChallenge = async () => {
     try {
       await api.delete(`/challenges/delete/${challenge.id}`);
@@ -57,7 +64,8 @@ export default function ChallengeCard({ challenge, onChallengeUpdate }) {
       showToast('Failed to delete challenge', 'error');
     }
   };
-
+  
+  // function to start challenge
   const handleStartChallenge = async () => {
     try {
       setIsStarting(true);

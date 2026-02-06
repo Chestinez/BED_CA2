@@ -1,20 +1,25 @@
+// API configuration with axios
+// Handles HTTP requests to backend and manages JWT token refresh
 import axios from "axios";
 
+// Main API instance - automatically refreshes tokens on 401 errors
 export const api = axios.create({
   baseURL: "http://localhost:3000/api",
-  withCredentials: true,
+  withCredentials: true, // Send cookies with requests
 });
 
-// Separate instance for auth verification that won't trigger redirects
+// Auth API instance - used for auth checks without triggering redirects
 export const authApi = axios.create({
   baseURL: "http://localhost:3000/api",
   withCredentials: true,
 });
 
+// Response interceptor - automatically refreshes expired tokens
 api.interceptors.response.use(
   (res) => res,
   async (err) => {
     const responseErrConfig = err.config;
+    // If 401 error and haven't retried yet, try to refresh token
     if (!responseErrConfig._retry && err.response?.status === 401) {
       responseErrConfig._retry = true;
 

@@ -1,3 +1,5 @@
+// Challenge Profile Page - Manage user's created challenges
+// Edit, delete, activate/deactivate own challenges
 import React, { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";

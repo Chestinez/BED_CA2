@@ -1,3 +1,5 @@
+// Shop Page - Browse and purchase ship parts
+// Displays parts by category and quality with filtering options
 import React, { useState, useEffect } from "react";
 import {
   ShoppingCart,

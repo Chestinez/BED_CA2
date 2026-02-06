@@ -1,4 +1,6 @@
 import React from 'react';
+// Simple full-page loader component
+// Used for early returns when page is loading data
 export default function Loader() {
   return (
     <div className="position-relative min-vh-100 bg-dark">

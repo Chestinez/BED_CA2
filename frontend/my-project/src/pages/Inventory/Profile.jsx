@@ -1,3 +1,5 @@
+// Profile Page - View user profile with stats and ship
+// Shows pending challenges, allows profile editing and account deletion
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";

@@ -1,3 +1,5 @@
+// Dashboard Page - Main landing page after login
+// Shows user stats, rank progression, and ship visualization with GSAP animations
 import { useRef } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import gsap from "gsap";
@@ -10,7 +12,6 @@ export default function Dashboard() {
   const { user, logout } = useAuth();
   const dashRef = useRef();
 
-  // Use live user data from auth context instead of localStorage
   const userProfile = user || null;
 
   // Calculate rank progression

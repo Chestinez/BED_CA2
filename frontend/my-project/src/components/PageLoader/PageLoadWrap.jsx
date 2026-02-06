@@ -1,10 +1,14 @@
+// Page wrapper with animated loader
+// Checks auth loading state and shows fancy fade-in animation
+// Use this to wrap page content for smooth transitions
 import React from "react";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+
 function PageLoadWrap({ children }) {
-  const { loading } = useAuth();
+  const { loading } = useAuth(); // Check if auth is loading
   const [isAnimationDone, setIsAnimationDone] = useState(false);
   const [showLoader, setShowLoader] = useState(true);
   const containerRef = useRef();

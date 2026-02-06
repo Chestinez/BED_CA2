@@ -1,3 +1,5 @@
+// Create Challenge Page - Form to create new challenges
+// Validates rewards based on difficulty level
 import React from "react";
 import { useState, useEffect } from "react";
 import { ArrowLeft, Target, Award, CheckCircle } from "lucide-react";
@@ -5,6 +7,7 @@ import BackArrow from "../../components/backArrow/BackArrow";
 import api from "../../services/api";
 import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
 import ContentLoadWrap from "../../components/PageLoader/ContentLoadWrap";
+
 export default function CreateChallenges() {
   const [showPopUp, setShowPopUp] = useState(false);
   const [validationError, setValidationError] = useState("");

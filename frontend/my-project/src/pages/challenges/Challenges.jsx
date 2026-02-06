@@ -1,3 +1,5 @@
+// Challenges Page - Browse all available challenges
+// Filter by active/inactive status, start challenges
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Plus, Trophy } from "lucide-react";
@@ -11,7 +13,7 @@ export default function Challenges() {
   const [challenges, setChallenges] = useState([]);
   const [filter, setFilter] = useState("all");
   const [loadChallenges, setLoadChallenges] = useState(true);
-
+  
   useEffect(() => {
     const fetchChallenges = async () => {
       try {

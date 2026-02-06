@@ -1,3 +1,5 @@
+// Challenge Details Page - View detailed information about a specific challenge
+// Shows rewards, duration, difficulty, and allows starting the challenge
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Trophy, Clock, User } from "lucide-react";

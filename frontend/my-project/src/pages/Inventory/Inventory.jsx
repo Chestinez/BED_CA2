@@ -1,3 +1,5 @@
+// Inventory Page - View and manage owned ship parts
+// Equip/unequip parts with slot capacity tracking
 import React, { useState, useEffect } from "react";
 import { Package, Search } from "lucide-react";
 import BackArrow from "../../components/backArrow/BackArrow";

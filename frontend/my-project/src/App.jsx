@@ -1,3 +1,5 @@
+// Main App component - defines all application routes
+// Uses React Router for navigation between pages
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login/loginPage";
 import "./App.css";
@@ -14,15 +16,15 @@ import ChallengeDetails from "./pages/challenges/ChallengeDetails";
 import ChallengeProfile from "./pages/challenges/ChallengeProfile";
 import Inventory from "./pages/Inventory/Inventory";
 
-// This is the main app component
-// Where all routes go
-// react-router-dom is used to set up routes
 export default function App() {
   return (
     <Router>
       <Routes>
+        {/* Public routes - accessible without login */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        
+        {/* Protected routes - require authentication */}
         <Route element={<ProtectedRoutes />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/" element={<Dashboard />} />
@@ -38,6 +40,7 @@ export default function App() {
           <Route path="/profile/:username" element={<Profile />} />
         </Route>
         
+        {/* 404 fallback */}
         <Route path="*" element={<h1>404 - Page not found</h1>} />
       </Routes>
     </Router>
