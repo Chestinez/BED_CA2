@@ -12,7 +12,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import api from "../../services/api";
-import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
+import Loader from "../../components/PageLoader/Loader";
 import { useAuth } from "../../hooks/useAuth";
 
 // Quality color schemes with proper Bootstrap classes and inline styles
@@ -157,11 +157,11 @@ export default function Shop() {
   };
 
   if (loading) {
-    return <PageLoadWrap />;
+    return <Loader />;
   }
 
   return (
-    <PageLoadWrap>
+    <div className="container-fluid mt-4">
       {/* Notification */}
       {notification.show && (
         <div
@@ -394,6 +394,6 @@ export default function Shop() {
           </div>
         )}
       </div>
-    </PageLoadWrap>
+    </div>
   );
 }

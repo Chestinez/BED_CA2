@@ -14,6 +14,9 @@ import ChallengeDetails from "./pages/challenges/ChallengeDetails";
 import ChallengeProfile from "./pages/challenges/ChallengeProfile";
 import Inventory from "./pages/Inventory/Inventory";
 
+// This is the main app component
+// Where all routes go
+// react-router-dom is used to set up routes
 export default function App() {
   return (
     <Router>
@@ -34,7 +37,7 @@ export default function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/:username" element={<Profile />} />
         </Route>
-
+        
         <Route path="*" element={<h1>404 - Page not found</h1>} />
       </Routes>
     </Router>

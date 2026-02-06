@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Trophy, Clock, User } from "lucide-react";
 import BackArrow from "../../components/backArrow/BackArrow";
 import api from "../../services/api";
-import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
+import Loader from "../../components/PageLoader/Loader";
 
 export default function ChallengeDetails() {
   const { id } = useParams();
@@ -31,40 +31,35 @@ export default function ChallengeDetails() {
   }, [id]);
 
   if (loading) {
-    return <PageLoadWrap />;
+    return <Loader />;
   }
 
   if (error) {
     return (
-      <PageLoadWrap>
-        <div className="container mt-4">
-          <div className="alert alert-danger">{error}</div>
-          <Link to="/challenges" className="btn btn-secondary">
-            <ArrowLeft size={16} className="me-2" />
-            Back to Challenges
-          </Link>
-        </div>
-      </PageLoadWrap>
+      <div className="container mt-4">
+        <div className="alert alert-danger">{error}</div>
+        <Link to="/challenges" className="btn btn-secondary">
+          <ArrowLeft size={16} className="me-2" />
+          Back to Challenges
+        </Link>
+      </div>
     );
   }
 
   if (!challenge) {
     return (
-      <PageLoadWrap>
-        <div className="container mt-4">
-          <div className="alert alert-warning">Challenge not found</div>
-          <Link to="/challenges" className="btn btn-secondary">
-            <ArrowLeft size={16} className="me-2" />
-            Back to Challenges
-          </Link>
-        </div>
-      </PageLoadWrap>
+      <div className="container mt-4">
+        <div className="alert alert-warning">Challenge not found</div>
+        <Link to="/challenges" className="btn btn-secondary">
+          <ArrowLeft size={16} className="me-2" />
+          Back to Challenges
+        </Link>
+      </div>
     );
   }
 
   return (
-    <PageLoadWrap>
-      <div className="container mt-4">
+    <div className="container mt-4">
         {/* Header */}
         <BackArrow Title="Challenge Details" />
 
@@ -188,6 +183,6 @@ export default function ChallengeDetails() {
           </div>
         </div>
       </div>
-    </PageLoadWrap>
+    </div>
   );
 }

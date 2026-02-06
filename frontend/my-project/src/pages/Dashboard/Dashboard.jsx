@@ -4,7 +4,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import Navbar from "../../components/navbar/Navbar";
 import ShipAssembly from "../../components/InventoryScene/ShipAssembly";
-import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
+import Loader from "../../components/PageLoader/Loader";
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -91,7 +91,7 @@ export default function Dashboard() {
   );
 
   if (!user) {
-    return <PageLoadWrap />;
+    return <Loader />;
   }
 
   return (

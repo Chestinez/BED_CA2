@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import api from "../../services/api";
-import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
+import Loader from "../../components/PageLoader/Loader";
 import {
   ChallengeStatsCard,
   ChallengeGridItem,
@@ -120,12 +120,11 @@ export default function ChallengeProfile() {
   };
 
   if (loading) {
-    return <PageLoadWrap />;
+    return <Loader />;
   }
 
   return (
-    <PageLoadWrap>
-      <div className="container mt-5 text-white">
+    <div className="container mt-5 text-white">
         {/* Notification */}
         <Notification notification={notification} />
 
@@ -178,6 +177,6 @@ export default function ChallengeProfile() {
           />
         )}
       </div>
-    </PageLoadWrap>
+    </div>
   );
 }

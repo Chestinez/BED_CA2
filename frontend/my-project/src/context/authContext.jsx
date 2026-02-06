@@ -9,8 +9,10 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const currentPath = window.location.pathname;
-
+    
+    // Initialize auth - used to check if user is authenticated, by pushing user to a route with auth middleware
     // Always try to verify user, but use authApi to avoid redirect loops
+    // and only redirect to login if not already on login or register pages
     const initializeAuth = async () => {
       try {
         const res = await authApi.get("/users/profile/me");

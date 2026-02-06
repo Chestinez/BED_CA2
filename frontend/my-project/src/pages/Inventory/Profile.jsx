@@ -4,8 +4,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { Edit3, Trash2 } from "lucide-react";
 import api from "../../services/api";
 import ShipAssembly from "../../components/InventoryScene/ShipAssembly";
-import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
-import BackArrow from "../../components/backArrow/BackArrow";
+import Loader from "../../components/PageLoader/Loader";
 import {
   ProfileHeader,
   CompletionModal,
@@ -177,19 +176,17 @@ export default function Profile() {
   };
 
   if (loading) {
-    return <PageLoadWrap />; // Just show the orb loader without text
+    return <Loader />;
   }
 
   if (error) {
     return (
-      <PageLoadWrap>
-        <div className="alert alert-danger">{error}</div>
-      </PageLoadWrap>
+      <div className="alert alert-danger">{error}</div>
     );
   }
 
   return (
-    <PageLoadWrap>
+    <div>
       {/* Completion Modal */}
       <CompletionModal
         challenge={selectedChallenge}
@@ -277,6 +274,6 @@ export default function Profile() {
           </div>
         )}
       </div>
-    </PageLoadWrap>
+    </div>
   );
 }

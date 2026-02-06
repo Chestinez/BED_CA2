@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Package, Search } from "lucide-react";
 import BackArrow from "../../components/backArrow/BackArrow";
 import api from "../../services/api";
-import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
+import Loader from "../../components/PageLoader/Loader";
 import ContentLoadWrap from "../../components/PageLoader/ContentLoadWrap";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -86,12 +86,11 @@ export default function Inventory() {
   };
 
   if (loading) {
-    return <PageLoadWrap />;
+    return <Loader />;
   }
 
   return (
-    <PageLoadWrap>
-      <div className="container-fluid mt-4">
+    <div className="container-fluid mt-4">
         {/* Header */}
         <div className="row mb-4">
           <div className="col-12">
@@ -207,6 +206,6 @@ export default function Inventory() {
           )}
         </ContentLoadWrap>
       </div>
-    </PageLoadWrap>
+    </div>
   );
 }
