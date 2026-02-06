@@ -124,7 +124,6 @@ export default function CreateChallenges() {
 
     try {
       const response = await api.post("/challenges/create", formData);
-      console.log("Challenge created successfully:", response.data);
       setShowPopUp(true);
       setValidationError(""); // Clear any previous errors
       

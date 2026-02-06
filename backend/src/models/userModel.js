@@ -163,7 +163,6 @@ module.exports = {
                 (pointsEarnedTowardsNext / totalPointsForNextRank) * 100,
               ),
             );
-            console.log("Calculated percentage:", percentage);
             return percentage;
           })();
           const profileData = {

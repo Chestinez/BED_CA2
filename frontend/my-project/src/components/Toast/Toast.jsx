@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
 import { CheckCircle, AlertCircle, X } from 'lucide-react';
 
+// Toast
+// A dynamic notification component that takes in a message, status type, and duration.
+// It uses useEffect to automatically close the toast after the specified duration.
 export default function Toast({ message, type = 'success', show, onClose, duration = 3000 }) {
   useEffect(() => {
     if (show) {

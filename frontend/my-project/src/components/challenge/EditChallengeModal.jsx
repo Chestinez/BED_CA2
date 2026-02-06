@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Edit3 } from "lucide-react";
 
 export default function EditChallengeModal({ challenge, difficulties, onSave, onClose }) {
@@ -25,24 +25,15 @@ export default function EditChallengeModal({ challenge, difficulties, onSave, on
     const totalRewards = points + credits;
     const selectedDifficulty = difficulties.find(d => d.id == currentFormData.difficulty_id) || { name: "Unknown", min_value: 0 };
     
-    console.log("Validating:", { 
-      points, 
-      credits, 
-      totalRewards, 
-      difficulty: selectedDifficulty.name,
-      formPoints: currentFormData.points_rewarded,
-      formCredits: currentFormData.credits_rewarded
-    });
-    
     // Check individual limits first
     if (points >= 90) {
-      setValidationError(`❌ Points cannot exceed 89 (current: ${points})`);
+      setValidationError(`Points cannot exceed 89 (current: ${points})`);
       setIsValid(false);
       return false;
     }
     
     if (credits >= 60) {
-      setValidationError(`❌ Credits cannot exceed 59 (current: ${credits})`);
+      setValidationError(`Credits cannot exceed 59 (current: ${credits})`);
       setIsValid(false);
       return false;
     }
@@ -106,15 +97,12 @@ export default function EditChallengeModal({ challenge, difficulties, onSave, on
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    console.log("Form submitted with data:", formData);
-    
     // Final validation - only check hard limits (individual limits)
     const points = parseInt(formData.points_rewarded || 0);
     const credits = parseInt(formData.credits_rewarded || 0);
     
     // Hard limits that prevent saving
     if (points >= 90 || credits >= 60) {
-      console.log("Cannot save: Hard limits exceeded");
       return; // Don't save if hard limits are exceeded
     }
     
@@ -145,7 +133,7 @@ export default function EditChallengeModal({ challenge, difficulties, onSave, on
     };
     
     if (isDifficultyMismatch) {
-      console.log("Challenge difficulty mismatch, setting to inactive");
+      // Challenge difficulty mismatch, will be set to inactive
     }
     
     onSave(finalFormData);

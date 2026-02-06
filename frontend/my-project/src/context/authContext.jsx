@@ -6,14 +6,6 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState(null);
-  const [popUp, setPopUp] = useState({ show: false, message: "", type: "" });
-
-  const showPopUp = (message, type = "info") => {
-    setPopUp({ show: true, message, type });
-    setTimeout(() => {
-      setPopUp({ show: false, message: "", type: "" });
-    }, 3000);
-  };
 
   useEffect(() => {
     const currentPath = window.location.pathname;
@@ -23,7 +15,9 @@ export const AuthProvider = ({ children }) => {
       try {
         const res = await authApi.get("/users/profile/me");
         // Fix: Extract user data from array format [userData]
-        const userData = Array.isArray(res.data.results) ? res.data.results[0] : res.data.results;
+        const userData = Array.isArray(res.data.results)
+          ? res.data.results[0]
+          : res.data.results;
         setUser(userData);
         setIsAuthenticated(true);
         localStorage.setItem("userData", JSON.stringify(userData));
@@ -40,7 +34,6 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
         setIsAuthenticated(false);
         localStorage.removeItem("userData");
-        // Don't redirect - let the user stay on current page
       } finally {
         setLoading(false);
       }
@@ -52,7 +45,9 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await authApi.get("/users/profile/me");
       // Fix: Extract user data from array format [userData]
-      const userData = Array.isArray(res.data.results) ? res.data.results[0] : res.data.results;
+      const userData = Array.isArray(res.data.results)
+        ? res.data.results[0]
+        : res.data.results;
       setUser(userData);
       setIsAuthenticated(true);
       // Update localStorage with fresh data
@@ -73,7 +68,9 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await authApi.get("/users/profile/me");
       // Fix: Extract user data from array format [userData]
-      const userData = Array.isArray(res.data.results) ? res.data.results[0] : res.data.results;
+      const userData = Array.isArray(res.data.results)
+        ? res.data.results[0]
+        : res.data.results;
       setUser(userData);
       localStorage.setItem("userData", JSON.stringify(userData));
       return true;
@@ -148,27 +145,11 @@ export const AuthProvider = ({ children }) => {
     register,
     verifyUser, // Expose verifyUser for manual calls
     refreshUserData, // Expose refreshUserData for updating stats
-    showPopUp,
-    popUp,
   };
 
   return (
     <authContext.Provider value={value}>
       {children}
-      {/* Global Popup */}
-      {popUp.show && (
-        <div 
-          className={`alert alert-${popUp.type === 'success' ? 'success' : 'danger'} position-fixed`}
-          style={{ 
-            top: '20px', 
-            right: '20px', 
-            zIndex: 9999,
-            minWidth: '300px'
-          }}
-        >
-          {popUp.message}
-        </div>
-      )}
     </authContext.Provider>
   );
 };

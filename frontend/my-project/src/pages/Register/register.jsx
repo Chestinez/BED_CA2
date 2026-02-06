@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 
 export default function Register() {
-  const { register, showPopUp } = useAuth();
+  const { register } = useAuth();
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -28,7 +28,6 @@ export default function Register() {
 
     try {
       await register(form.username, form.email, form.password, form.description);
-      showPopUp("Crew profile created. Welcome aboard.", "success");
       window.location.href = "/dashboard";
     } catch (err) {
       setErrMsg(err.response?.data?.message || "Registration Failed");

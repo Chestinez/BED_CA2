@@ -1,6 +1,8 @@
 import React from "react";
 import { ArrowLeft } from "lucide-react";
 
+// back arrow that directs users to previous page
+// used for most pages other than dashboard
 export default function BackArrow({ Title }) {
   return (
     <div className="d-flex align-items-center mb-4">

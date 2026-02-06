@@ -96,7 +96,6 @@ export default function ChallengeProfile() {
       const wasSetToInactive = originalChallenge.is_active === "1" && challengeData.is_active === "0";
       
       const response = await api.put(`/challenges/update/${challengeData.id}`, challengeData);
-      console.log("Update response:", response.data);
       
       // Refresh the challenges list to get updated data with difficulty names
       await fetchUserChallenges();
