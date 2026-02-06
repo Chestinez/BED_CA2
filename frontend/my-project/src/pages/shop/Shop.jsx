@@ -161,7 +161,8 @@ export default function Shop() {
   }
 
   return (
-    <div className="container-fluid mt-4">
+    <div className="min-vh-100 bg-dark">
+      <div className="container-fluid pt-4">
       {/* Notification */}
       {notification.show && (
         <div
@@ -394,6 +395,7 @@ export default function Shop() {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }

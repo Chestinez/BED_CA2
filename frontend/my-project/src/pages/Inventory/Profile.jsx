@@ -181,12 +181,15 @@ export default function Profile() {
 
   if (error) {
     return (
-      <div className="alert alert-danger">{error}</div>
+      <div className="min-vh-100 bg-dark pt-4">
+        <div className="alert alert-danger">{error}</div>
+      </div>
     );
   }
 
   return (
-    <div>
+    <div className="min-vh-100 bg-dark">
+      <div className="container pt-4">
       {/* Completion Modal */}
       <CompletionModal
         challenge={selectedChallenge}
@@ -274,6 +277,7 @@ export default function Profile() {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }

@@ -11,10 +11,11 @@ export default function ChallengeCard({ challenge, onChallengeUpdate }) {
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  // Fix: user is an array, so we need to access user[0]
+  // get userdata from localstorage
   const currentUser = user && localStorage.getItem('userData') ? JSON.parse(localStorage.getItem('userData'))[0] : null;
   const isOwner = currentUser && challenge.creator_id && challenge.creator_id === currentUser.id;
-
+  
+  // function to show toast
   const showToast = (message, type = 'success') => {
     setToast({ show: true, message, type });
   };

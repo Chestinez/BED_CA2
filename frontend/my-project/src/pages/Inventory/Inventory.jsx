@@ -10,7 +10,11 @@ export default function Inventory() {
   const [loading, setLoading] = useState(true);
   const [inventory, setInventory] = useState([]);
   const [actionLoading, setActionLoading] = useState(null);
-  const [slotInfo, setSlotInfo] = useState({ max_slots: 0, used_slots: 0, remaining_slots: 0 });
+  const [slotInfo, setSlotInfo] = useState({
+    max_slots: 0,
+    used_slots: 0,
+    remaining_slots: 0,
+  });
   const { refreshUserData } = useAuth();
 
   //as soon as page loads fetch inventory
@@ -90,122 +94,123 @@ export default function Inventory() {
   }
 
   return (
-    <div className="container-fluid mt-4">
-        {/* Header */}
-        <div className="row mb-4">
-          <div className="col-12">
-            <div className="d-flex justify-content-between align-items-center">
-              <BackArrow Title="Inventory" />
-              <div className="d-flex align-items-center gap-3">
-                <div className="text-end">
-                  <div className="text-muted small">Slot Capacity</div>
-                  <div className="fw-bold">
-                    <span className="text-white">
-                      {slotInfo.used_slots}
-                    </span>
-                    <span className="text-muted"> / {slotInfo.max_slots}</span>
-                  </div>
+    <div className="min-vh-100 bg-dark">
+      <div className="container-fluid pt-4">
+      {/* Header */}
+      <div className="row mb-4">
+        <div className="col-12">
+          <div className="d-flex justify-content-between align-items-center">
+            <BackArrow Title="Inventory" />
+            <div className="d-flex align-items-center gap-3">
+              <div className="text-end">
+                <div className="text-muted small">Slot Capacity</div>
+                <div className="fw-bold">
+                  <span className="text-white">{slotInfo.used_slots}</span>
+                  <span className="text-muted"> / {slotInfo.max_slots}</span>
                 </div>
-                <span className="text-muted">
-                  {inventory.length} items
-                </span>
               </div>
+              <span className="text-muted">{inventory.length} items</span>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Inventory Grid */}
-        <ContentLoadWrap isLoading={loading}>
-          {inventory.length === 0 ? (
-            <div className="text-center text-muted mt-5">
-              <Package size={64} className="mb-3 opacity-50" />
-              <p className="h5">No items found</p>
-              <p>Visit the shop to purchase ship parts!</p>
-            </div>
-          ) : (
-            <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-              {inventory.map((item) => (
-                <div key={item.inventory_id} className="col">
-                  <div
-                    className={`card bg-dark h-100 ${
-                      item.is_equipped === "equipped"
-                        ? "border-success"
-                        : "border-secondary"
-                    }`}
-                    style={{ minWidth: "280px", maxWidth: "450px", margin: "0 auto" }}
-                  >
-                    <div className="card-body d-flex flex-column">
-                      {/* Header */}
-                      <div className="d-flex justify-content-between align-items-start mb-2">
-                        <h6 className="card-title text-white">{item.name}</h6>
-                        {item.is_equipped === "equipped" && (
-                          <span className="badge bg-success">Equipped</span>
-                        )}
+      {/* Inventory Grid */}
+      <ContentLoadWrap isLoading={loading}>
+        {inventory.length === 0 ? (
+          <div className="text-center text-muted mt-5">
+            <Package size={64} className="mb-3 opacity-50" />
+            <p className="h5">No items found</p>
+            <p>Visit the shop to purchase ship parts!</p>
+          </div>
+        ) : (
+          <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {inventory.map((item) => (
+              <div key={item.inventory_id} className="col">
+                <div
+                  className={`card bg-dark h-100 ${
+                    item.is_equipped === "equipped"
+                      ? "border-success"
+                      : "border-secondary"
+                  }`}
+                  style={{
+                    minWidth: "280px",
+                    maxWidth: "450px",
+                    margin: "0 auto",
+                  }}
+                >
+                  <div className="card-body d-flex flex-column">
+                    {/* Header */}
+                    <div className="d-flex justify-content-between align-items-start mb-2">
+                      <h6 className="card-title text-white">{item.name}</h6>
+                      {item.is_equipped === "equipped" && (
+                        <span className="badge bg-success">Equipped</span>
+                      )}
+                    </div>
+
+                    {/* Description */}
+                    <p className="card-text text-muted small mb-3">
+                      {item.description}
+                    </p>
+
+                    {/* Stats */}
+                    <div className="mb-3">
+                      <div className="d-flex justify-content-between align-items-center mb-1">
+                        <span
+                          className={`badge ${getQualityBadge(item.quality)}`}
+                        >
+                          {item.quality.toUpperCase()}
+                        </span>
+                        <span className="text-muted small">
+                          {item.category}
+                        </span>
                       </div>
-
-                      {/* Description */}
-                      <p className="card-text text-muted small mb-3">
-                        {item.description}
-                      </p>
-
-                      {/* Stats */}
-                      <div className="mb-3">
-                        <div className="d-flex justify-content-between align-items-center mb-1">
-                          <span
-                            className={`badge ${getQualityBadge(item.quality)}`}
-                          >
-                            {item.quality.toUpperCase()}
-                          </span>
-                          <span className="text-muted small">
-                            {item.category}
-                          </span>
-                        </div>
-                        <div className="d-flex justify-content-between align-items-center">
-                          <span className="text-warning small">
-                            {item.cost} credits
-                          </span>
-                          <span className="text-info small">
-                            {item.slot_size} slots
-                          </span>
-                        </div>
+                      <div className="d-flex justify-content-between align-items-center">
+                        <span className="text-warning small">
+                          {item.cost} credits
+                        </span>
+                        <span className="text-info small">
+                          {item.slot_size} slots
+                        </span>
                       </div>
+                    </div>
 
-                      {/* Action Button */}
-                      <div className="mt-auto">
-                        {item.is_equipped === "equipped" ? (
-                          <button
-                            className="btn btn-sm btn-outline-danger w-100"
-                            onClick={() => handleUnequip(item.inventory_id)}
-                            disabled={actionLoading === item.inventory_id}
-                          >
-                            {actionLoading === item.inventory_id ? (
-                              <>Unequipping...</>
-                            ) : (
-                              "Unequip"
-                            )}
-                          </button>
-                        ) : (
-                          <button
-                            className="btn btn-sm btn-outline-success w-100"
-                            onClick={() => handleEquip(item.part_id)}
-                            disabled={actionLoading === item.part_id}
-                          >
-                            {actionLoading === item.part_id ? (
-                              <>Equipping...</>
-                            ) : (
-                              "Equip"
-                            )}
-                          </button>
-                        )}
-                      </div>
+                    {/* Action Button */}
+                    <div className="mt-auto">
+                      {item.is_equipped === "equipped" ? (
+                        <button
+                          className="btn btn-sm btn-outline-danger w-100"
+                          onClick={() => handleUnequip(item.inventory_id)}
+                          disabled={actionLoading === item.inventory_id}
+                        >
+                          {actionLoading === item.inventory_id ? (
+                            <>Unequipping...</>
+                          ) : (
+                            "Unequip"
+                          )}
+                        </button>
+                      ) : (
+                        <button
+                          className="btn btn-sm btn-outline-success w-100"
+                          onClick={() => handleEquip(item.part_id)}
+                          disabled={actionLoading === item.part_id}
+                        >
+                          {actionLoading === item.part_id ? (
+                            <>Equipping...</>
+                          ) : (
+                            "Equip"
+                          )}
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </ContentLoadWrap>
-      </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </ContentLoadWrap>
+    </div>
     </div>
   );
 }

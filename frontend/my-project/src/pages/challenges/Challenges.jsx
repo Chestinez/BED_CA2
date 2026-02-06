@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Plus, Trophy } from "lucide-react";
 import BackArrow from "../../components/backArrow/BackArrow";
 import api from "../../services/api";
 import ContentLoadWrap from "../../components/PageLoader/ContentLoadWrap";
 import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
 import ChallengeCard from "../../components/challenge/ChallengeCard";
-import { Outlet } from "react-router-dom";
 
 export default function Challenges() {
   const [challenges, setChallenges] = useState([]);
@@ -31,12 +30,12 @@ export default function Challenges() {
   const handleChallengeUpdate = (challengeId, updatedChallenge) => {
     if (updatedChallenge === null) {
       // Challenge was deleted
-      setChallenges(challenges.filter(c => c.id !== challengeId));
+      setChallenges(challenges.filter((c) => c.id !== challengeId));
     } else {
       // Challenge was updated
-      setChallenges(challenges.map(c => 
-        c.id === challengeId ? updatedChallenge : c
-      ));
+      setChallenges(
+        challenges.map((c) => (c.id === challengeId ? updatedChallenge : c)),
+      );
     }
   };
 
@@ -49,7 +48,6 @@ export default function Challenges() {
 
   return (
     <PageLoadWrap>
-      <Outlet />
       <div className="container-fluid mt-4">
         {/* Header */}
         <div className="row mb-4">
@@ -106,9 +104,9 @@ export default function Challenges() {
                   </div>
                 ) : (
                   filteredChallenges.map((challenge) => (
-                    <ChallengeCard 
-                      key={challenge.id} 
-                      challenge={challenge} 
+                    <ChallengeCard
+                      key={challenge.id}
+                      challenge={challenge}
                       onChallengeUpdate={handleChallengeUpdate}
                     />
                   ))
