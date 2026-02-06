@@ -8,7 +8,7 @@ const AppError = require("../../utils/AppError.js");
 router.get("/shop", auth, controllers.getallpartsinshop);
 router.get("/inventory/equipped", auth, controllers.getAllPartsequipped);
 router.get("/inventory", auth, controllers.getAllPartsOwnedbyUser);
-
+router.get("/partTypes", controllers.getAllPartTypes);
 // put requests
 router.put("/equip/:partId", auth, controllers.equipPart);
 router.put("/equip/", (req, res, next) => {

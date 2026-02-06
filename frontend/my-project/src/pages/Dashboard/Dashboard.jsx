@@ -192,10 +192,8 @@ export default function Dashboard() {
                 {userProfile.missions_total > 0 && (
                   <>
                     <br />
-                    {userProfile.missions_total}{' '}
-                    <small className="text-muted">
-                      of total missions
-                    </small>
+                    {userProfile.missions_total}{" "}
+                    <small className="text-muted">total missions</small>
                   </>
                 )}
               </h2>
@@ -231,10 +229,6 @@ export default function Dashboard() {
                   <i className="fas fa-rocket me-2"></i>
                   Your {userProfile.rank} Ship
                 </h4>
-                <a href="/ship" className="btn btn-outline-primary btn-sm">
-                  <i className="fas fa-cogs me-1"></i>
-                  Customize
-                </a>
               </div>
               {/* Use ShipAssembly directly instead of ShipDisplay */}
               <div className="d-flex justify-content-center">

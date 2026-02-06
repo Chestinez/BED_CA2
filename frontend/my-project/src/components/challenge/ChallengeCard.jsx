@@ -12,7 +12,7 @@ export default function ChallengeCard({ challenge, onChallengeUpdate }) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Fix: user is an array, so we need to access user[0]
-  const currentUser = Array.isArray(user) ? user[0] : user;
+  const currentUser = user && localStorage.getItem('userData') ? JSON.parse(localStorage.getItem('userData'))[0] : null;
   const isOwner = currentUser && challenge.creator_id && challenge.creator_id === currentUser.id;
 
   const showToast = (message, type = 'success') => {
@@ -21,18 +21,18 @@ export default function ChallengeCard({ challenge, onChallengeUpdate }) {
 
   const handleToggleActive = async () => {
     try {
-      const newStatus = challenge.is_active === "1" ? "0" : "1";
+      const new_is_active = challenge.is_active === "1" ? "0" : "1";
       await api.put(`/challenges/update/${challenge.id}`, {
         ...challenge,
-        is_active: newStatus
+        is_active: new_is_active
       });
       
       if (onChallengeUpdate) {
-        onChallengeUpdate(challenge.id, { ...challenge, is_active: newStatus });
+        onChallengeUpdate(challenge.id, { ...challenge, is_active: new_is_active });
       }
       
       showToast(
-        `Challenge ${newStatus === "1" ? "activated" : "deactivated"} successfully`, 
+        `Challenge ${new_is_active === "1" ? "activated" : "deactivated"} successfully`, 
         'success'
       );
     } catch (err) {

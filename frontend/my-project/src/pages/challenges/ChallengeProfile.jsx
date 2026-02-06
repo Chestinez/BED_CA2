@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Target, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import api from "../../services/api";
 import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
@@ -11,6 +11,7 @@ import {
   EmptyState,
   Notification
 } from "../../components/challenge";
+import BackArrow from "../../components/backArrow/BackArrow";
 
 export default function ChallengeProfile() {
   const [challenges, setChallenges] = useState([]);
@@ -131,10 +132,7 @@ export default function ChallengeProfile() {
 
         {/* Header */}
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h1 className="h2 mb-0">
-            <Target size={28} className="me-2" />
-            My Challenge Arsenal
-          </h1>
+          <BackArrow Title="My Challenges Hub" />
           <Link to="/challenges/create" className="btn btn-primary">
             <Plus size={20} className="me-2" />
             Create New Challenge

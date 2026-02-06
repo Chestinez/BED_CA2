@@ -25,17 +25,24 @@ export default function EditChallengeModal({ challenge, difficulties, onSave, on
     const totalRewards = points + credits;
     const selectedDifficulty = difficulties.find(d => d.id == currentFormData.difficulty_id) || { name: "Unknown", min_value: 0 };
     
-    console.log("Validating:", { points, credits, totalRewards, difficulty: selectedDifficulty.name });
+    console.log("Validating:", { 
+      points, 
+      credits, 
+      totalRewards, 
+      difficulty: selectedDifficulty.name,
+      formPoints: currentFormData.points_rewarded,
+      formCredits: currentFormData.credits_rewarded
+    });
     
     // Check individual limits first
     if (points >= 90) {
-      setValidationError("❌ Points cannot exceed 90");
+      setValidationError(`❌ Points cannot exceed 89 (current: ${points})`);
       setIsValid(false);
       return false;
     }
     
     if (credits >= 60) {
-      setValidationError("❌ Credits cannot exceed 60");
+      setValidationError(`❌ Credits cannot exceed 59 (current: ${credits})`);
       setIsValid(false);
       return false;
     }
@@ -55,20 +62,21 @@ export default function EditChallengeModal({ challenge, difficulties, onSave, on
       maxAllowed = Infinity; // No upper limit for Hard
     }
     
-    if (totalRewards > maxAllowed) {
-      setValidationError(
-        `❌ ${selectedDifficulty.name} difficulty allows a maximum of ${maxAllowed} total rewards. Current: ${totalRewards}. Consider using a higher difficulty.`
-      );
-      setIsValid(false);
-      return false;
-    }
-    
+    // For difficulty validation, show as warnings but allow saving
     if (totalRewards < minRequired) {
       setValidationError(
-        `❌ ${selectedDifficulty.name} difficulty requires a minimum of ${minRequired} total rewards. Current: ${totalRewards}. This challenge will be set to INACTIVE until fixed.`
+        `⚠️ Note: ${selectedDifficulty.name} difficulty typically requires ${minRequired}+ total rewards. Current: ${totalRewards} (Points: ${points} + Credits: ${credits}). You can still save this change.`
       );
-      setIsValid(false);
-      return false;
+      setIsValid(true); // Allow saving but show warning
+      return true;
+    }
+    
+    if (totalRewards > maxAllowed) {
+      setValidationError(
+        `⚠️ Note: ${selectedDifficulty.name} difficulty typically allows maximum ${maxAllowed} total rewards. Current: ${totalRewards} (Points: ${points} + Credits: ${credits}). Consider using a higher difficulty.`
+      );
+      setIsValid(true); // Allow saving but show warning
+      return true;
     }
     
     setValidationError("");
@@ -100,17 +108,44 @@ export default function EditChallengeModal({ challenge, difficulties, onSave, on
     
     console.log("Form submitted with data:", formData);
     
-    // Final validation
-    const isCurrentlyValid = validateRewards(formData);
+    // Final validation - only check hard limits (individual limits)
+    const points = parseInt(formData.points_rewarded || 0);
+    const credits = parseInt(formData.credits_rewarded || 0);
     
-    // If invalid, automatically set is_active to "0"
+    // Hard limits that prevent saving
+    if (points >= 90 || credits >= 60) {
+      console.log("Cannot save: Hard limits exceeded");
+      return; // Don't save if hard limits are exceeded
+    }
+    
+    // For difficulty mismatches, set to inactive but allow saving
+    const totalRewards = points + credits;
+    const selectedDifficulty = difficulties.find(d => d.id == formData.difficulty_id) || { name: "Unknown", min_value: 0 };
+    
+    let minRequired = 0;
+    let maxAllowed = 200;
+    
+    if (selectedDifficulty.id == 1) { // Easy
+      minRequired = 0;
+      maxAllowed = 50;
+    } else if (selectedDifficulty.id == 2) { // Medium
+      minRequired = 51;
+      maxAllowed = 100;
+    } else if (selectedDifficulty.id == 3) { // Hard
+      minRequired = 101;
+      maxAllowed = 200;
+    }
+    
+    // If difficulty doesn't match, set to inactive
+    const isDifficultyMismatch = totalRewards < minRequired || totalRewards > maxAllowed;
+    
     const finalFormData = {
       ...formData,
-      is_active: isCurrentlyValid ? formData.is_active : "0"
+      is_active: isDifficultyMismatch ? "0" : formData.is_active
     };
     
-    if (!isCurrentlyValid) {
-      console.log("Challenge is invalid, setting to inactive");
+    if (isDifficultyMismatch) {
+      console.log("Challenge difficulty mismatch, setting to inactive");
     }
     
     onSave(finalFormData);

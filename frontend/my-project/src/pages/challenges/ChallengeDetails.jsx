@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Trophy, Clock, User } from "lucide-react";
+import BackArrow from "../../components/backArrow/BackArrow";
 import api from "../../services/api";
 import ContentLoadWrap from "../../components/PageLoader/ContentLoadWrap";
 import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
@@ -66,12 +67,7 @@ export default function ChallengeDetails() {
     <PageLoadWrap>
       <div className="container mt-4">
         {/* Header */}
-        <div className="d-flex align-items-center mb-4">
-          <Link to="/challenges" className="btn btn-outline-secondary me-3">
-            <ArrowLeft size={20} />
-          </Link>
-          <h1 className="text-white mb-0">Challenge Details</h1>
-        </div>
+        <BackArrow Title="Challenge Details" />
 
         {/* Challenge Info */}
         <ContentLoadWrap isLoading={loading}>

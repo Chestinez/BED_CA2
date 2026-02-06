@@ -1,6 +1,8 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { Package, Grid, List, Filter, Search } from 'lucide-react';
+import BackArrow from '../../components/backArrow/BackArrow';
+import api from '../../services/api';
 import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -9,6 +11,7 @@ export default function Inventory() {
   const [viewMode, setViewMode] = useState('grid');
   const [filterCategory, setFilterCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [error, setError] = useState(null);
   const { user } = useAuth();
 
   // Mock inventory data for UI
@@ -22,9 +25,21 @@ export default function Inventory() {
   ];
 
   useEffect(() => {
-    // For now use mock data, replace with API call later
-    setInventory(mockInventory);
+    const fetchInventory = async () => {
+      try {
+        const res = await api.get('/resources/inventory');
+        setInventory(res.data.results);
+      } catch (err) {
+        console.error("Error fetching inventory:", err);
+        setError(err.response?.data?.message || "Failed to load inventory");
+      }
+    }
+
+    fetchInventory();
   }, []);
+
+  const handleEquip = () => {}
+  const handleUnequip = () => {}
 
   const categories = ['all', 'weapons', 'hulls', 'engines', 'shields'];
 
@@ -88,7 +103,6 @@ export default function Inventory() {
             <th>Item Name</th>
             <th>Category</th>
             <th>Rarity</th>
-            <th>Quantity</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
@@ -134,10 +148,7 @@ export default function Inventory() {
         <div className="row mb-4">
           <div className="col-12">
             <div className="d-flex justify-content-between align-items-center">
-              <h1 className="text-white mb-0">
-                <Package className="me-2" size={32} />
-                Ship Inventory
-              </h1>
+              <BackArrow Title="Inventory" />
               <div className="d-flex align-items-center">
                 <span className="text-muted me-3">
                   {filteredInventory.length} items

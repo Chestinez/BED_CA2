@@ -1,9 +1,10 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { ArrowLeft, Target, Award, CheckCircle } from "lucide-react";
+import BackArrow from "../../components/backArrow/BackArrow";
 import api from "../../services/api";
 import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
-
+import ContentLoadWrap from "../../components/PageLoader/ContentLoadWrap";
 export default function CreateChallenges() {
   const [showPopUp, setShowPopUp] = useState(false);
   const [validationError, setValidationError] = useState("");
@@ -121,8 +122,6 @@ export default function CreateChallenges() {
       return;
     }
 
-    console.log("Submitting challenge data:", formData);
-
     try {
       const response = await api.post("/challenges/create", formData);
       console.log("Challenge created successfully:", response.data);
@@ -183,15 +182,7 @@ export default function CreateChallenges() {
         )}
 
         {/* Header with Back Arrow */}
-        <div className="d-flex align-items-center mb-4">
-          <button
-            className="btn btn-outline-secondary me-3"
-            onClick={() => window.history.back()}
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <h1 className="h2 mb-0">Construct New Challenge</h1>
-        </div>
+        <BackArrow Title="CONSTRUCT YOUR CHALLENGE" />
 
         <form
           onSubmit={handleSubmit}

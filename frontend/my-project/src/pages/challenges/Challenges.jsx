@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Trophy } from "lucide-react";
+import { Plus } from "lucide-react";
+import BackArrow from "../../components/backArrow/BackArrow";
 import api from "../../services/api";
 import ContentLoadWrap from "../../components/PageLoader/ContentLoadWrap";
 import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
@@ -54,10 +55,7 @@ export default function Challenges() {
         <div className="row mb-4">
           <div className="col-12">
             <div className="d-flex justify-content-between align-items-center">
-              <h1 className="text-white mb-0">
-                <Trophy className="me-2" size={32} />
-                Mission Control
-              </h1>
+              <BackArrow Title="Challenges" />
               <Link to="/challenges/create" className="btn btn-primary">
                 <Plus size={20} className="me-2" />
                 Create Challenge

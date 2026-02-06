@@ -1,4 +1,4 @@
-// Challenge Components Barrel Export
+// Challenge Components Export
 export { default as ChallengeCard } from './ChallengeCard';
 export { default as ChallengeStatsCard } from './ChallengeStatsCard';
 export { default as ChallengeGridItem } from './ChallengeGridItem';

@@ -23,7 +23,7 @@ module.exports = {
   },
   purchasePart(req, res, next) {// purchase part
     const userId = req.userId;
-    const partId = req.params.partId;
+    const partId = parseInt(req.params.partId); // Convert to integer
 
     const data = { userId, partId };
     resourceModel.purchasePart(data, (err, results) => {
@@ -114,6 +114,18 @@ module.exports = {
       
       res.status(200).json({
         message: "User ship retrieved successfully",
+        results: results
+      });
+    });
+  },
+
+  getAllPartTypes(_, res, next) { // get all part types
+    resourceModel.getAllPartTypes((err, results) => {
+      if (err) {
+        return next(new AppError("Failed to get part types", 500));
+      }
+      res.status(200).json({
+        message: "part types success",
         results: results
       });
     });

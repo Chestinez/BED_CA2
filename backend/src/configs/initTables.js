@@ -96,7 +96,7 @@ const initializeDatabase = async () => {
       )
     `);
 
-    // Create ship_parts table
+    // Create ship_parts table with quality system
     await executeQuery(`
       CREATE TABLE IF NOT EXISTS ship_parts (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -104,19 +104,43 @@ const initializeDatabase = async () => {
         description TEXT,
         cost INT NOT NULL,
         category ENUM('Engine', 'Shield', 'Weapon', 'Hull','Hybrid'),
-        image_url VARCHAR(255),
+        quality ENUM('common', 'rare', 'epic', 'legendary') DEFAULT 'common',
         slot_size INT NOT NULL
       )
     `);
 
-    // Insert ship_parts data only if table is empty
+    // Insert ship_parts data with quality system
     const partsCount = await executeQuery("SELECT COUNT(*) as count FROM ship_parts");
     if (partsCount[0].count === 0) {
       await executeQuery(`
-        INSERT INTO ship_parts (name, description, cost, category, image_url, slot_size) VALUES
-        ('Ion Thruster v1', 'Basic propulsion for cadet pilots.', 100, 'Engine', 'url1', 2),
-        ('Titanium Plating', 'Extra protection against space debris.', 250, 'Hull', 'url2', 4),
-        ('Plasma Cannon', 'Standard defense for deep nebula exploration.', 500, 'Weapon', 'url3', 100)
+        INSERT INTO ship_parts (name, description, cost, category, quality, slot_size) VALUES
+        -- Common Parts (50-150 credits, 1-2 slots)
+        ('Basic Ion Thruster', 'Standard propulsion for new pilots.', 75, 'Engine', 'common', 1),
+        ('Steel Plating', 'Basic hull protection.', 50, 'Hull', 'common', 1),
+        ('Pulse Laser', 'Entry-level weapon system.', 100, 'Weapon', 'common', 1),
+        ('Basic Shield Generator', 'Standard defensive system.', 80, 'Shield', 'common', 1),
+        ('Standard Core', 'Basic hybrid system.', 120, 'Hybrid', 'common', 2),
+        
+        -- Rare Parts (200-400 credits, 2-3 slots)
+        ('Advanced Ion Drive', 'Enhanced propulsion with better efficiency.', 250, 'Engine', 'rare', 2),
+        ('Titanium Armor', 'Reinforced hull protection.', 300, 'Hull', 'rare', 2),
+        ('Plasma Rifle', 'High-energy weapon system.', 350, 'Weapon', 'rare', 2),
+        ('Deflector Shield', 'Advanced defensive matrix.', 280, 'Shield', 'rare', 2),
+        ('Fusion Core', 'Enhanced hybrid power system.', 400, 'Hybrid', 'rare', 3),
+        
+        -- Epic Parts (500-800 credits, 3-4 slots)
+        ('Quantum Engine', 'Cutting-edge propulsion technology.', 600, 'Engine', 'epic', 3),
+        ('Neutronium Hull', 'Ultra-dense protective plating.', 700, 'Hull', 'epic', 3),
+        ('Antimatter Cannon', 'Devastating energy weapon.', 750, 'Weapon', 'epic', 3),
+        ('Phase Shield', 'Reality-bending defensive system.', 650, 'Shield', 'epic', 3),
+        ('Singularity Core', 'Exotic matter power source.', 800, 'Hybrid', 'epic', 4),
+        
+        -- Legendary Parts (1000+ credits, 4-5 slots)
+        ('Void Engine', 'Transcendent propulsion system.', 1200, 'Engine', 'legendary', 4),
+        ('Dimensional Armor', 'Reality-warping protection.', 1500, 'Hull', 'legendary', 4),
+        ('Galaxy Destroyer', 'Planet-cracking weapon system.', 1800, 'Weapon', 'legendary', 5),
+        ('Infinity Shield', 'Impenetrable defensive barrier.', 1400, 'Shield', 'legendary', 4),
+        ('Universe Core', 'Cosmic power source.', 2000, 'Hybrid', 'legendary', 5)
       `);
     }
 

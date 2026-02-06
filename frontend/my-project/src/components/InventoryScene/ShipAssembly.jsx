@@ -1,18 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Zap, // Engine
-  Shield, // Shield  
-  Crosshair, // Weapon
-  Box, // Hull
-  Cpu, // Hybrid
-  Settings,
-  Star
-} from 'lucide-react';
-import api from '../../services/api';
+import React, { useState, useEffect } from "react";
+import { Zap, Shield, Crosshair, Box, Cpu, Settings, Star } from "lucide-react";
+import api from "../../services/api";
+import ContentLoadWrap from "../PageLoader/ContentLoadWrap";
 
 const baseShipsUrl = {
   1: "/baseShips/Ship1.png",
-  2: "/baseShips/Ship2.png", 
+  2: "/baseShips/Ship2.png",
   3: "/baseShips/Ship3.png",
   4: "/baseShips/Ship4.png",
   5: "/baseShips/Ship5.png",
@@ -22,6 +15,7 @@ const baseShipsUrl = {
 };
 
 // Background based on rank - same mapping as ships
+
 const rankBackgrounds = {
   1: "/baseShipsBackgrounds/Roboxel-SpaceBackground01.png",
   2: "/baseShipsBackgrounds/Roboxel-SpaceBackground02.png",
@@ -30,272 +24,119 @@ const rankBackgrounds = {
   5: "/baseShipsBackgrounds/Roboxel-SpaceBackground08.png",
   6: "/baseShipsBackgrounds/Roboxel-SpaceBackground09.png",
   7: "/baseShipsBackgrounds/Roboxel-SpaceBackground10.png",
-  8: "/baseShipsBackgrounds/Roboxel-SpaceBackground01.png", // Fallback
+  8: "/baseShipsBackgrounds/blue-preview.png",
 };
 
-// Ship part icons
 const partIcons = {
-  'Engine': Zap,
-  'Shield': Shield,
-  'Weapon': Crosshair,
-  'Hull': Box,
-  'Hybrid': Cpu
+  Engine: Zap,
+  Shield,
+  Weapon: Crosshair,
+  Hull: Box,
+  Hybrid: Cpu,
+};
+
+const qualityClasses = {
+  common: "border-secondary bg-dark text-light",
+  rare: "border-primary bg-primary bg-opacity-10 text-primary",
+  epic: "border-info bg-info bg-opacity-10 text-info", // Using info for purple-ish
+  legendary: "border-warning bg-warning bg-opacity-10 text-warning",
 };
 
 export default function ShipAssembly({ profileData }) {
   const [equippedParts, setEquippedParts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  // Fetch equipped parts from API
   useEffect(() => {
     const fetchEquippedParts = async () => {
       try {
         setLoading(true);
-        const response = await api.get('/resources/inventory/equipped');
+        const response = await api.get("/resources/inventory/equipped");
         setEquippedParts(response.data.results || []);
       } catch (error) {
-        console.error('Error fetching equipped parts:', error);
-        setEquippedParts([]);
+        console.error(error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchEquippedParts();
   }, []);
 
-  const shipImage = baseShipsUrl[profileData?.rank_id || 1];
-  const background = rankBackgrounds[profileData?.rank_id || 1];
+  const rankId = profileData?.rank_id || 1;
 
   return (
-    <div style={{
-      width: '100%'
-    }}>
-      {/* Main Ship Assembly Card */}
-      <div style={{
-        position: 'relative',
-        width: '100%',
-        height: '450px',
-        backgroundColor: '#0a0a0a',
-        borderRadius: '12px',
-        overflow: 'hidden',
-        border: '1px solid #333',
-        marginBottom: '16px'
-      }}>
-        {/* Space Background */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `url(${background})`,
-          backgroundSize: '100% 100%', // Force to fill entire container
-          backgroundPosition: 'center center',
-          backgroundRepeat: 'no-repeat',
-          width: '100%',
-          height: '100%',
-          opacity: 0.8
-        }} />
+    <div className="w-100">
+      {/* Main Ship Display */}
+      <div
+        className="position-relative w-100 rounded-3 border border-secondary overflow-hidden shadow-lg"
+        style={{
+          height: "450px",
+          backgroundImage: `url(${rankBackgrounds[rankId]})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        {/* Dark Overlay for contrast */}
+        <div
+          className="position-absolute inset-0 w-100 h-100"
+          style={{ background: "rgba(0,0,0,0.4)" }}
+        />
 
-        {/* Gradient overlay for better contrast */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'linear-gradient(45deg, rgba(0,0,50,0.3), rgba(50,0,100,0.2))',
-          zIndex: 1
-        }} />
-
-        {/* Rank Info */}
-        {profileData && (
-          <div style={{
-            position: 'absolute',
-            top: '16px',
-            left: '16px',
-            backgroundColor: 'rgba(0,0,0,0.8)',
-            borderRadius: '8px',
-            padding: '12px',
-            border: '1px solid #fbbf24',
-            zIndex: 10
-          }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              color: '#fbbf24',
-              marginBottom: '4px'
-            }}>
-              <Star size={18} />
-              <span style={{ fontWeight: 'bold' }}>{profileData.rank_name}</span>
-            </div>
-            <div style={{
-              fontSize: '12px',
-              color: '#d1d5db'
-            }}>
-              {profileData.points}pts • {profileData.credits}cr
-            </div>
+        {/* Rank Badge */}
+        <div className="position-absolute top-0 start-0 m-3 p-2 bg-dark bg-opacity-75 border border-warning rounded shadow">
+          <div className="d-flex align-items-center gap-2 text-warning fw-bold">
+            <Star size={16} /> {profileData?.rank_name || "Recruit"}
           </div>
-        )}
+          <small className="text-white-50">{profileData?.points}pts</small>
+        </div>
 
-        {/* Main Ship - Center Stage */}
-        <div style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          marginTop: '-160px', // Half of ship height
-          marginLeft: '-160px', // Half of ship width
-          zIndex: 5
-        }}>
-          {/* Ship glow effect */}
-          <div style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            marginTop: '-200px', // Half of glow size
-            marginLeft: '-200px', // Half of glow size
-            width: '400px',
-            height: '400px',
-            background: 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, transparent 70%)',
-            borderRadius: '50%',
-            animation: 'pulse 3s ease-in-out infinite'
-          }} />
-          
-          {/* Ship image */}
-          <img 
-            src={shipImage} 
-            alt="Player Ship" 
+        {/* Ship Image */}
+        <div className="position-absolute top-50 start-50 translate-middle text-center">
+          <img
+            src={baseShipsUrl[rankId]}
+            className="img-fluid"
             style={{
-              position: 'relative',
-              width: '320px',
-              height: '320px',
-              objectFit: 'contain',
-              filter: 'drop-shadow(0 0 20px rgba(59,130,246,0.5))',
-              zIndex: 10
+              width: "300px",
+              filter: "drop-shadow(0 0 15px rgba(221, 0, 255, 0.5))",
             }}
-            onError={(e) => {
-              console.log('Ship image failed to load:', shipImage);
-              e.target.src = '/baseShips/Ship1.png'; // Fallback
-            }}
+            alt="Ship"
           />
         </div>
       </div>
 
-      {/* Equipped Parts - Separate Section Below */}
-      <div style={{
-        width: '100%',
-        backgroundColor: 'rgba(0,0,0,0.9)',
-        borderRadius: '12px',
-        border: '1px solid #374151',
-        minHeight: '120px' // Added minimum height to make it less skinny
-      }}>
-        <div style={{ padding: '20px' }}> {/* Increased padding */}
-          <h3 style={{
-            color: 'white',
-            textAlign: 'center',
-            fontWeight: 'bold',
-            marginBottom: '16px', // Increased margin
-            fontSize: '18px' // Increased font size
-          }}>
-            Equipped Parts
-          </h3>
-          
+      {/* Parts Section */}
+      <div className="mt-3 p-3 bg-dark bg-opacity-50 border border-secondary rounded-3">
+        <h5 className="text-white text-center mb-3 small tracking-widest uppercase">
+          Equipped Modules
+        </h5>
+
+        <div className="d-flex justify-content-center flex-wrap gap-2">
           {loading ? (
-            <div style={{
-              textAlign: 'center',
-              color: '#9ca3af',
-              padding: '24px 0'
-            }}>
-              <Settings size={32} style={{ 
-                margin: '0 auto 8px',
-                animation: 'spin 1s linear infinite'
-              }} />
-              <p>Loading parts...</p>
-            </div>
+            <div className="text-muted small">Accessing inventory...</div>
           ) : equippedParts.length > 0 ? (
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '16px',
-              overflowX: 'auto',
-              paddingBottom: '8px'
-            }}>
-              {equippedParts.map(part => {
-                const Icon = partIcons[part.category] || Settings;
-                return (
-                  <div 
-                    key={part.id}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      padding: '12px',
-                      backgroundColor: '#1f2937',
-                      borderRadius: '8px',
-                      border: '1px solid #374151',
-                      minWidth: '90px',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease'
-                    }}
-                    title={`${part.name} - ${part.description || 'No description'}`}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = '#3b82f6';
-                      e.currentTarget.style.backgroundColor = '#1e3a8a';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = '#374151';
-                      e.currentTarget.style.backgroundColor = '#1f2937';
-                    }}
+            equippedParts.map((part) => {
+              const Icon = partIcons[part.category] || Settings;
+              return (
+                <div
+                  key={part.id}
+                  className={`p-2 border rounded text-center d-flex flex-column align-items-center ${qualityClasses[part.quality]}`}
+                  style={{ minWidth: "100px", transition: "0.2s" }}
+                >
+                  <Icon size={20} className="mb-1" />
+                  <span className="small fw-bold d-block">{part.name}</span>
+                  <span
+                    className="tiny text-uppercase opacity-75"
+                    style={{ fontSize: "9px" }}
                   >
-                    <Icon size={24} style={{ color: '#3b82f6', marginBottom: '4px' }} />
-                    <span style={{
-                      fontSize: '12px',
-                      color: 'white',
-                      textAlign: 'center',
-                      fontWeight: '500'
-                    }}>
-                      {part.name}
-                    </span>
-                    <span style={{
-                      fontSize: '10px',
-                      color: '#9ca3af'
-                    }}>
-                      {part.category}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+                    {part.quality}
+                  </span>
+                </div>
+              );
+            })
           ) : (
-            <div style={{
-              textAlign: 'center',
-              color: '#9ca3af',
-              padding: '32px 0' // Increased padding for empty state
-            }}>
-              <Settings size={32} style={{ 
-                margin: '0 auto 8px',
-                opacity: 0.5
-              }} />
-              <p>No parts equipped</p>
-              <p style={{ fontSize: '14px' }}>Visit the shop to get ship parts</p>
-            </div>
+            <p className="text-muted small">No modules equipped.</p>
           )}
         </div>
       </div>
-
-      {/* Add CSS animations */}
-      <style jsx>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.6; }
-        }
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 }

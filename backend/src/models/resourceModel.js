@@ -7,11 +7,11 @@ module.exports = {
   getallshopitems(userId, callback) {
     const sql = `
     SELECT
-     p.id AS part_id,
+     p.id,
      p.name,
      p.category,
      p.cost,
-     p.image_url,
+     p.quality,
      p.slot_size,
      p.description,
      ui.id AS inventory_id
@@ -176,7 +176,7 @@ module.exports = {
      p.name,
      p.category,
      p.cost,
-     p.image_url,
+     p.quality,
      p.slot_size,
      p.description,
      ui.is_equipped,
@@ -205,7 +205,7 @@ module.exports = {
      p.name,
      p.category,
      p.cost,
-     p.image_url,
+     p.quality,
      p.slot_size,
      p.description
      FROM user_inventory ui
@@ -396,9 +396,17 @@ module.exports = {
       }
       
       const shipData = results[0];
-      shipData.available_slots = shipData.max_slots - shipData.used_slots;
+      shipData.remaining_slots = shipData.max_slots - shipData.used_slots;
       
       callback(null, shipData);
     });
   },
+
+  getAllPartTypes(callback) {
+    const sql = `SELECT ENUM FROM INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_NAME = 'ship_parts' AND COLUMN_NAME = 'quality' `;
+    pool.query(sql, (err, results) => {
+      if (err) return callback(err);
+      return callback(null, results);
+    })
+  }
 };
