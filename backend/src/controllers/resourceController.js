@@ -2,10 +2,12 @@ const resourceModel = require("../models/resourceModel.js");
 const AppError = require("../../utils/AppError.js");
 
 module.exports = {
-  getallpartsinshop(req, res, next) { // get all parts in shop
+  getallpartsinshop(req, res, next) {
+    // get all parts in shop
     const userId = req.userId;
 
-    resourceModel.getallshopitems(userId, (err, results) => { // get all parts in ship_parts table
+    resourceModel.getallshopitems(userId, (err, results) => {
+      // get all parts in ship_parts table
       if (err) {
         return next(new AppError("Internal Server Error", 500));
       }
@@ -21,7 +23,8 @@ module.exports = {
       });
     });
   },
-  purchasePart(req, res, next) {// purchase part
+  purchasePart(req, res, next) {
+    // purchase part
     const userId = req.userId;
     const partId = parseInt(req.params.partId); // Convert to integer
 
@@ -42,9 +45,10 @@ module.exports = {
       });
     });
   },
-  getAllPartsOwnedbyUser(req, res, next) {// get all parts owned by user
+  getAllPartsOwnedbyUser(req, res, next) {
+    // get all parts owned by user
     const userId = req.userId;
-    resourceModel.getAllPartsOwnedbyUser(userId, (err, results) => { 
+    resourceModel.getAllPartsOwnedbyUser(userId, (err, results) => {
       if (err) {
         return next(new AppError("Internal Server Error", 500));
       }
@@ -53,7 +57,8 @@ module.exports = {
       });
     });
   },
-  getAllPartsequipped(req, res, next) { // get all parts equipped within inventory
+  getAllPartsequipped(req, res, next) {
+    // get all parts equipped within inventory
     const userId = req.userId;
     resourceModel.getAllequippedParts(userId, (err, results) => {
       if (err) {
@@ -64,7 +69,8 @@ module.exports = {
       });
     });
   },
-  equipPart(req, res, next) { // equip part
+  equipPart(req, res, next) {
+    // equip part
     const userId = req.userId;
     const partId = req.params.partId;
 
@@ -73,7 +79,7 @@ module.exports = {
       if (err) {
         return next(
           new AppError(err.message, 400) || // error messages, to return err 400 for when a model transaction fails and sends a new Error
-            new AppError("Internal Server Error", 500)
+            new AppError("Internal Server Error", 500),
         );
       }
 
@@ -83,7 +89,8 @@ module.exports = {
       });
     });
   },
-  removePart(req, res, next) { // remove part
+  removePart(req, res, next) {
+    // remove part
     const userId = req.userId;
     const inventoryId = req.params.inventoryId;
 
@@ -111,22 +118,10 @@ module.exports = {
       if (err) {
         return next(new AppError("Failed to get user ship", 500));
       }
-      
+
       res.status(200).json({
         message: "User ship retrieved successfully",
-        results: results
-      });
-    });
-  },
-
-  getAllPartTypes(_, res, next) { // get all part types
-    resourceModel.getAllPartTypes((err, results) => {
-      if (err) {
-        return next(new AppError("Failed to get part types", 500));
-      }
-      res.status(200).json({
-        message: "part types success",
-        results: results
+        results: results,
       });
     });
   },

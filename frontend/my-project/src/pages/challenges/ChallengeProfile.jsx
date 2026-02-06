@@ -121,7 +121,7 @@ export default function ChallengeProfile() {
   };
 
   if (loading) {
-    return <PageLoadWrap><div className="text-center text-white">Loading your challenges...</div></PageLoadWrap>;
+    return <PageLoadWrap />;
   }
 
   return (

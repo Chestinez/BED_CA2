@@ -152,15 +152,15 @@ module.exports = {
                                 newCredits: newcredits,
                               });
                             });
-                          }
+                          },
                         );
-                      }
+                      },
                     );
-                  }
+                  },
                 );
-              }
+              },
             );
-          }
+          },
         );
       });
     });
@@ -247,7 +247,7 @@ module.exports = {
         SELECT
          (SELECT p.slot_size FROM ship_parts p JOIN user_inventory ui ON p.id = ui.part_id WHERE ui.part_id = ? AND ui.user_id = ?) AS newPartSlotSize,
          (SELECT ui.is_equipped FROM user_inventory ui WHERE ui.part_id = ? AND ui.user_id = ?) AS currentequippedstatus,
-         (SELECT IFNULL(SUM(p.slot_size), 0) FROM ship_parts p JOIN user_inventory ui ON p.id = ui.part_id WHERE p.id != ? AND ui.user_id = ? AND ui.is_equipped = 'equipped') AS currentEquippedSize,
+         (SELECT IFNULL(SUM(p.slot_size), 0) FROM ship_parts p JOIN user_inventory ui ON p.id = ui.part_id WHERE ui.part_id != ? AND ui.user_id = ? AND ui.is_equipped = 'equipped') AS currentEquippedSize,
          (SELECT r.max_slots FROM \`rank\` r JOIN user u ON u.points >= r.min_points WHERE u.id = ? ORDER BY r.min_points DESC LIMIT 1) AS currentmaxSlotSizebyRank
         `;
 
@@ -277,7 +277,7 @@ module.exports = {
               });
             }
 
-            // destructure the results
+            // destructure the results and convert to numbers
             const {
               newPartSlotSize,
               currentequippedstatus,
@@ -285,7 +285,12 @@ module.exports = {
               currentmaxSlotSizebyRank,
             } = results[0];
 
-            if (newPartSlotSize === null || newPartSlotSize === undefined) {
+            // Convert to numbers to avoid string concatenation
+            const newPartSlots = Number(newPartSlotSize);
+            const currentSlots = Number(currentEquippedSize);
+            const maxSlots = Number(currentmaxSlotSizebyRank);
+
+            if (newPartSlots === null || isNaN(newPartSlots)) {
               return connection.rollback(() => {
                 connection.release();
                 return callback(new Error("Part or rank data not found"));
@@ -301,10 +306,7 @@ module.exports = {
 
             // calculate if the new part will fit in the user's inventory
             // if not, return error
-            if (
-              newPartSlotSize + currentEquippedSize >
-              currentmaxSlotSizebyRank
-            ) {
+            if (newPartSlots + currentSlots > maxSlots) {
               return connection.rollback(() => {
                 connection.release();
                 return callback(new Error("Insufficient slot capacity"));
@@ -334,9 +336,9 @@ module.exports = {
                   connection.release();
                   return callback(null, updateresults);
                 });
-              }
+              },
             );
-          }
+          },
         );
       });
     });
@@ -388,25 +390,17 @@ module.exports = {
       ORDER BY r.min_points DESC
       LIMIT 1
     `;
-    
+
     pool.query(sql, [userId, userId], (err, results) => {
       if (err) return callback(err);
       if (!results || results.length === 0) {
         return callback(new Error("User not found"));
       }
-      
+
       const shipData = results[0];
       shipData.remaining_slots = shipData.max_slots - shipData.used_slots;
-      
+
       callback(null, shipData);
     });
   },
-
-  getAllPartTypes(callback) {
-    const sql = `SELECT ENUM FROM INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_NAME = 'ship_parts' AND COLUMN_NAME = 'quality' `;
-    pool.query(sql, (err, results) => {
-      if (err) return callback(err);
-      return callback(null, results);
-    })
-  }
 };

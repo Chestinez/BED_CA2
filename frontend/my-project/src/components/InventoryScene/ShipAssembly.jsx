@@ -108,34 +108,33 @@ export default function ShipAssembly({ profileData }) {
         <h5 className="text-white text-center mb-3 small tracking-widest uppercase">
           Equipped Modules
         </h5>
-
-        <div className="d-flex justify-content-center flex-wrap gap-2">
-          {loading ? (
-            <div className="text-muted small">Accessing inventory...</div>
-          ) : equippedParts.length > 0 ? (
-            equippedParts.map((part) => {
-              const Icon = partIcons[part.category] || Settings;
-              return (
-                <div
-                  key={part.id}
-                  className={`p-2 border rounded text-center d-flex flex-column align-items-center ${qualityClasses[part.quality]}`}
-                  style={{ minWidth: "100px", transition: "0.2s" }}
-                >
-                  <Icon size={20} className="mb-1" />
-                  <span className="small fw-bold d-block">{part.name}</span>
-                  <span
-                    className="tiny text-uppercase opacity-75"
-                    style={{ fontSize: "9px" }}
+        <ContentLoadWrap isLoading={loading}>
+          <div className="d-flex justify-content-center flex-wrap gap-2">
+            {equippedParts.length > 0 ? (
+              equippedParts.map((part) => {
+                const Icon = partIcons[part.category] || Settings;
+                return (
+                  <div
+                    key={part.id}
+                    className={`p-2 border rounded text-center d-flex flex-column align-items-center ${qualityClasses[part.quality]}`}
+                    style={{ minWidth: "100px", transition: "0.2s" }}
                   >
-                    {part.quality}
-                  </span>
-                </div>
-              );
-            })
-          ) : (
-            <p className="text-muted small">No modules equipped.</p>
-          )}
-        </div>
+                    <Icon size={20} className="mb-1" />
+                    <span className="small fw-bold d-block">{part.name}</span>
+                    <span
+                      className="tiny text-uppercase opacity-75"
+                      style={{ fontSize: "9px" }}
+                    >
+                      {part.quality}
+                    </span>
+                  </div>
+                );
+              })
+            ) : (
+              <p className="text-muted small">No modules equipped.</p>
+            )}
+          </div>
+        </ContentLoadWrap>
       </div>
     </div>
   );
