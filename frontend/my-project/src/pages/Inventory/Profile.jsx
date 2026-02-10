@@ -256,7 +256,7 @@ export default function Profile() {
           <h3 className="text-white mb-3 text-center">Ship Assembly</h3>
           <div className="d-flex justify-content-center">
             <div style={{ width: "100%", maxWidth: "1000px" }}>
-              <ShipAssembly profileData={profileData} />
+              <ShipAssembly profileData={profileData} isOwnProfile={isOwnProfile} />
             </div>
           </div>
         </div>

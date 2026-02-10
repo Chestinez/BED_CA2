@@ -42,24 +42,29 @@ const qualityClasses = {
   legendary: "border-warning bg-warning bg-opacity-10 text-warning",
 };
 
-export default function ShipAssembly({ profileData }) {
+export default function ShipAssembly({ profileData, isOwnProfile = true }) {
   const [equippedParts, setEquippedParts] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchEquippedParts = async () => {
-      try {
-        setLoading(true);
-        const response = await api.get("/resources/inventory/equipped");
-        setEquippedParts(response.data.results || []);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchEquippedParts();
-  }, []);
+    // Only fetch equipped parts if viewing own profile
+    if (isOwnProfile) {
+      const fetchEquippedParts = async () => {
+        try {
+          setLoading(true);
+          const response = await api.get("/resources/inventory/equipped");
+          setEquippedParts(response.data.results || []);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchEquippedParts();
+    } else {
+      setLoading(false);
+    }
+  }, [isOwnProfile]);
 
   const rankId = profileData?.rank_id || 1;
 
@@ -109,31 +114,45 @@ export default function ShipAssembly({ profileData }) {
           Equipped Modules
         </h5>
         <ContentLoadWrap isLoading={loading}>
-          <div className="d-flex justify-content-center flex-wrap gap-2">
-            {equippedParts.length > 0 ? (
-              equippedParts.map((part) => {
-                const Icon = partIcons[part.category] || Settings;
-                return (
-                  <div
-                    key={part.id}
-                    className={`p-2 border rounded text-center d-flex flex-column align-items-center ${qualityClasses[part.quality]}`}
-                    style={{ minWidth: "100px", transition: "0.2s" }}
-                  >
-                    <Icon size={20} className="mb-1" />
-                    <span className="small fw-bold d-block">{part.name}</span>
-                    <span
-                      className="tiny text-uppercase opacity-75"
-                      style={{ fontSize: "9px" }}
+          {!isOwnProfile ? (
+            <div className="text-center py-4">
+              <div className="d-flex flex-column align-items-center gap-2">
+                <Settings size={32} className="text-muted opacity-50" />
+                <p className="text-muted mb-1">
+                  <strong>Equipped modules are private</strong>
+                </p>
+                <p className="text-muted small" style={{ maxWidth: "400px" }}>
+                  Ship parts are personal trophies and accomplishments. Players showcase their rank and progression, but their collection remains private.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="d-flex justify-content-center flex-wrap gap-2">
+              {equippedParts.length > 0 ? (
+                equippedParts.map((part) => {
+                  const Icon = partIcons[part.category] || Settings;
+                  return (
+                    <div
+                      key={part.id}
+                      className={`p-2 border rounded text-center d-flex flex-column align-items-center ${qualityClasses[part.quality]}`}
+                      style={{ minWidth: "100px", transition: "0.2s" }}
                     >
-                      {part.quality}
-                    </span>
-                  </div>
-                );
-              })
-            ) : (
-              <p className="text-muted small">No modules equipped.</p>
-            )}
-          </div>
+                      <Icon size={20} className="mb-1" />
+                      <span className="small fw-bold d-block">{part.name}</span>
+                      <span
+                        className="tiny text-uppercase opacity-75"
+                        style={{ fontSize: "9px" }}
+                      >
+                        {part.quality}
+                      </span>
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="text-muted small">No modules equipped.</p>
+              )}
+            </div>
+          )}
         </ContentLoadWrap>
       </div>
     </div>
