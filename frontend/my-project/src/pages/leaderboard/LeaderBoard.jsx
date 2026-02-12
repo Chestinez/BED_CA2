@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import api from "../../services/api";
 import PageLoadWrap from "../../components/PageLoader/pageLoadWrap";
 import ContentLoadWrap from "../../components/PageLoader/ContentLoadWrap";
+import BackArrow from "../../components/backArrow/BackArrow";
 import { useAuth } from "../../hooks/useAuth";
 import GetLeaderboardPosition from "../../components/leaderboard/GetLeaderboardPosition";
 
@@ -96,7 +97,7 @@ export default function LeaderBoard() {
   return (
     <PageLoadWrap>
       <div className="container mt-4">
-        <h1 className="text-white mb-4">Leaderboard</h1>
+        <BackArrow Title="Leaderboard" />
 
         {error && (
           <div className="alert alert-danger" role="alert">

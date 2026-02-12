@@ -7,6 +7,7 @@ import { Edit3, Trash2 } from "lucide-react";
 import api from "../../services/api";
 import ShipAssembly from "../../components/InventoryScene/ShipAssembly";
 import Loader from "../../components/PageLoader/Loader";
+import BackArrow from "../../components/backArrow/BackArrow";
 import {
   ProfileHeader,
   CompletionModal,
@@ -92,7 +93,7 @@ export default function Profile() {
       setSelectedChallenge(null);
 
       alert(
-        `Challenge completed! You earned ${response.data.newTotalPoints} points and ${response.data.newTotalCredits} credits!`,
+        `Challenge completed! You now have ${response.data.newTotalPoints} total points and ${response.data.newTotalCredits} total credits!`,
       );
 
       // Refresh user data to update dashboard stats
@@ -219,9 +220,7 @@ export default function Profile() {
 
       <div className="container mt-4">
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h1 className="text-white mb-0">
-            {username ? `${username}'s Profile` : "My Profile"}
-          </h1>
+          <BackArrow Title={username ? `${username}'s Profile` : "My Profile"} />
           
           {/* Edit/Delete buttons - only show on own profile */}
           {isOwnProfile && (

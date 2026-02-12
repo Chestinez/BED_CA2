@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import api from "../../services/api";
 import Loader from "../../components/PageLoader/Loader";
+import BackArrow from "../../components/backArrow/BackArrow";
 import { useAuth } from "../../hooks/useAuth";
 
 // Quality color schemes with proper Bootstrap classes and inline styles
@@ -181,9 +182,7 @@ export default function Shop() {
           <div className="col-12">
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                <h1 className="text-white mb-1">
-                  Galactic Ship Parts Emporium
-                </h1>
+                <BackArrow Title="Galactic Ship Parts Emporium" />
                 <p className="text-muted">
                   Upgrade your vessel with premium components
                 </p>
